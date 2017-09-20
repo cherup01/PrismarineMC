@@ -92,6 +92,7 @@ use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\level\sound\LaunchSound;
+use pocketmine\level\sound\MinecraftSound;
 use pocketmine\level\WeakPosition;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector2;
@@ -2134,9 +2135,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			case EntityEventPacket::EATING: 
 				$slot = $this->inventory->getItemInHand();
 				if($slot instanceof Food){
-					$this->level->broadcastLevelSoundEvent($this->add(0, 2, 0), LevelSoundEventPacket::SOUND_EAT);
+					$this->level->addSound(new MinecraftSound($this->add(0, 2, 0), "random.eat"));
 				}elseif($slot instanceof Potion){
-					$this->level->broadcastLevelSoundEvent($this->add(0, 2, 0), LevelSoundEventPacket::SOUND_DRINK);
+					$this->level->addSound(new MinecraftSound($this->add(0, 2, 0), "random.drink"));
 				}
 				break;
 			default:
