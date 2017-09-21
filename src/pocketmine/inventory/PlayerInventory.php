@@ -70,7 +70,7 @@ class PlayerInventory extends BaseInventory{
 	}
 
 	public function getDefaultSize() : int{
-		return 40; //36 inventory, 4 armor
+		return 40; //36 inventory, 4 armor, TODO: left hand
 	}
 
 	public function getSize() : int{
@@ -297,6 +297,11 @@ class PlayerInventory extends BaseInventory{
 		if($holder instanceof Player and !$holder->spawned){
 			return;
 		}
+		
+		if($index === self::CURSOR_INDEX){
+			$this->sendCursor();
+			return;
+		}
 
 		if($index >= $this->getSize()){
 			$this->sendArmorSlot($index, $this->getViewers());
@@ -313,6 +318,14 @@ class PlayerInventory extends BaseInventory{
 	 */
 	public function getHotbarSize() : int{
 		return 9;
+	}
+	
+	public function getCursor() : Item{
+		return $this->getItem(self::CURSOR_INDEX);
+	}
+	
+	public function setCursor(Item $item){
+		$this->setItem(self::CURSOR_INDEX, $item);
 	}
 
 	public function getArmorItem(int $index) : Item{
@@ -391,6 +404,22 @@ class PlayerInventory extends BaseInventory{
 			return true;
 		}
 	}
+	
+
+	public function contains(Item $item) : bool{
+		if($this->cursor !== null){
+			$count = max(1, $item->getCount());
+			$checkDamage = !$item->hasAnyDamageValue();
+			$checkTags = $item->hasCompoundTag();
+			if($item->equals($this->cursor, $checkDamage, $checkTags)){
+				$count -= $this->cursor->getCount();
+				if($count <= 0){
+					return true;
+				}
+			}
+		}
+		return parent::contains($item);
+	}
 
 	public function getItem(int $index): Item {
 		if($index === self::CURSOR_INDEX){
@@ -406,6 +435,8 @@ class PlayerInventory extends BaseInventory{
 		for($i = $this->getSize(), $m = $i + 4; $i < $m; ++$i){
 			$this->clear($i, false);
 		}
+		
+		$this->clear(self::CURSOR_INDEX, false);
 
 		$this->sendArmorContents($this->getViewers());
 	}
@@ -537,6 +568,7 @@ class PlayerInventory extends BaseInventory{
 
 			if($player === $this->getHolder()){
 				$this->sendHotbar();
+				$this->sendCursor();
 			}
 		}
 	}
@@ -558,7 +590,8 @@ class PlayerInventory extends BaseInventory{
 	 * @param Player|Player[] $target
 	 */
 	public function sendSlot(int $index, $target){
-		if($index < 0){
+		if($index === self::CURSOR_INDEX){
+			$this->sendCursor();
 			return;
 		}
 		if($target instanceof Player){
