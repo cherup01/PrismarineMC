@@ -189,7 +189,7 @@ class PlayerInventory extends BaseInventory{
 	public function sendCursor(){
 		$pk = new InventorySlotPacket();
 		$pk->inventorySlot = 0;
-		$pk->item = clone $this->cursor;
+		$pk->item = $this->getItem(self::CURSOR_ITEM);
 		$pk->windowId = ContainerIds::CURSOR;
 		$this->getHolder()->dataPacket($pk);
 	}
