@@ -160,6 +160,20 @@ class CraftingManager{
 	}
 
 	/**
+	 * @param Item $item
+	 * @return Recipe[]
+	 */
+	public function getRecipesByResult(Item $item) : array{
+		$result = [];
+		foreach($this->recipes as $recipe){
+			if($recipe->getResult()->equals($item) and $recipe->getResult()->getCount() === $item->getCount()){
+				$result[] = $recipe;
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * @return Recipe[]
 	 */
 	public function getRecipes() : array{

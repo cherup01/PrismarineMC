@@ -3060,9 +3060,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			return true;
 		}
 
-		$recipe = $this->server->getCraftingManager()->getRecipe($packet->id);
-
 		if($this->craftingType === self::CRAFTING_ANVIL){
+			$recipe = $this->server->getCraftingManager()->getRecipe($packet->id);
+
 			$anvilInventory = $this->windowIndex[$packet->windowId] ?? null;
 			if($anvilInventory === null){
 				foreach($this->windowIndex as $window){
@@ -3091,42 +3091,52 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 
 		$craftSlots = $this->craftingGrid->getContents();
-		if($recipe instanceof ShapedRecipe){
-			$ingredients = [];
-			$itemGrid = $recipe->getIngredientMap();
-			foreach($itemGrid as $line){
-				foreach($line as $item){
-					$ingredients[] = $item;
+		$recipe = null;
+		foreach($this->server->getCraftingManager()->getRecipesByResult($packet->output[0]) as $r){
+			$resultSlots = $craftSlots;
+			if($r instanceof ShapedRecipe){
+				$ingredients = [];
+				$itemGrid = $r->getIngredientMap();
+				foreach($itemGrid as $line){
+					foreach($line as $item){
+						$ingredients[] = $item;
+					}
 				}
+			}elseif($r instanceof ShapelessRecipe){
+				$ingredients = $r->getIngredientList();
 			}
-		}elseif($recipe instanceof ShapelessRecipe){
-			$ingredients = $recipe->getIngredientList();
-		}
-		$ingredientsCount = count($ingredients);
-		$firstIndex = 0;
-		foreach($craftSlots as &$item){
-			if($item === null or $item->getId() === Item::AIR){
-				continue;
-			}
-			for($i = $firstIndex; $i < $ingredientsCount; $i++){
-				$ingredient = $ingredients[$i];
-				if($ingredient->getId() === Item::AIR){
+			$ingredientsCount = count($ingredients);
+			$firstIndex = 0;
+			foreach($resultSlots as &$item){
+				if($item === null or $item->getId() === Item::AIR){
 					continue;
 				}
-				$isItemsNotEquals = $item->getId() !== $ingredient->getId() ||
-					($item->getDamage() !== $ingredient->getDamage() && $ingredient->getDamage() !== 32767 &&
-					$ingredient->getDamage() !== -1) || $item->getCount() < $ingredient->getCount();
-				if($isItemsNotEquals){
-					$this->server->getLogger()->debug("Recieved bad recipe from player ".$this->username);
-					return true;
+				for($i = $firstIndex; $i < $ingredientsCount; $i++){
+					$ingredient = $ingredients[$i];
+					if($ingredient->getId() === Item::AIR){
+						continue;
+					}
+					$isItemsNotEquals = $item->getId() !== $ingredient->getId() ||
+						($item->getDamage() !== $ingredient->getDamage() && $ingredient->getDamage() !== 32767 &&
+						$ingredient->getDamage() !== -1) || $item->getCount() < $ingredient->getCount();
+					if($isItemsNotEquals){
+						continue 3;
+					}
+					$firstIndex = $i + 1;
+					$item->setCount($item->getCount() - $ingredient->getCount());
+					if($item->getCount() === 0){
+						$item = Item::get(Item::AIR, 0, 0);
+					}
+					break;
 				}
-				$firstIndex = $i + 1;
-				$item->setCount($item->getCount() - $ingredient->getCount());
-				if($item->getCount() === 0){
-					$item = Item::get(Item::AIR, 0, 0);
-				}
-				break;
 			}
+			$craftSlots = $resultSlots;
+			$recipe = $r;
+			break;
+		}
+		if($recipe === null){
+			$this->server->getLogger()->debug("Received bad recipe from " . $this->username);
+			return true;
 		}
 		$this->craftingGrid->setItem(CraftingGrid::RESULT_INDEX, $recipe->getResult());
 		foreach($craftSlots as $slot => $item){

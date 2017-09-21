@@ -91,7 +91,7 @@ class SlotChangeAction extends InventoryAction{
 	 * @return bool
 	 */
 	public function isValid(Player $source) : bool{
-		if($this->inventorySlot < 0){ //TODO: Anti-cheat
+		if($this->inventorySlot < 0 or $this->containerId === -1){ //TODO: Anti-cheat
 			return true;
 		}
 		$check = $this->inventory->getItem($this->inventorySlot);
