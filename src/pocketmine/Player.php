@@ -2142,22 +2142,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$this->setGenericFlag(self::DATA_FLAG_ACTION, false); //TODO: check if this should be true
 
 		switch($packet->event){
-			case EntityEventPacket::USE_ITEM: //Eating
-				$slot = $this->inventory->getItemInHand();
-
-				if($slot->canBeConsumed()){
-					$ev = new PlayerItemConsumeEvent($this, $slot);
-					if(!$slot->canBeConsumedBy($this)){
-						$ev->setCancelled();
-					}
-					$this->server->getPluginManager()->callEvent($ev);
-					if(!$ev->isCancelled()){
-						$slot->onConsume($this);
-					}else{
-						$this->inventory->sendContents($this);
-					}
-				}
-				break;
 			case EntityEventPacket::EATING:
 				$slot = $this->inventory->getItemInHand();
 				if($slot instanceof Food){
@@ -2165,6 +2149,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 				}elseif($slot instanceof Potion){
 					$this->level->addSound(new MinecraftSound($this->add(0, 2, 0), "random.drink"));
 				}
+				break;
 			default:
 				return false;
 		}
@@ -2729,6 +2714,22 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 						}
 
 						return true;
+					case InventoryTransactionPacket::RELEASE_ITEM_ACTION_CONSUME:
+						$slot = $this->inventory->getItemInHand();
+						if($slot->canBeConsumed()){
+							$ev = new PlayerItemConsumeEvent($this, $slot);
+							if(!$slot->canBeConsumedBy($this)){
+								$ev->setCancelled();
+							}
+							$this->server->getPluginManager()->callEvent($ev);
+							if(!$ev->isCancelled()){
+								$slot->onConsume($this);
+							}else{
+								$this->inventory->sendContents($this);
+							}
+						}
+
+						return true;
 					default:
 						break;
 				}
@@ -2736,9 +2737,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			default:
 				$this->inventory->sendContents($this);
 				break;
-
 		}
-
 		return false; //TODO
 	}
 
@@ -3092,6 +3091,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		$craftSlots = $this->craftingGrid->getContents();
 		$recipe = null;
+		$ingredients = [];
 		foreach($this->server->getCraftingManager()->getRecipesByResult($packet->output[0]) as $r){
 			$resultSlots = $craftSlots;
 			if($r instanceof ShapedRecipe){
@@ -3116,9 +3116,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 					if($ingredient->getId() === Item::AIR){
 						continue;
 					}
+					if($ingredient->getDamage() === -1 or $ingredient->getDamage() === 32767){
+						$ingredient->setDamage($item->getDamage());
+						$ingredients[$i] = $ingredient;
+					}
 					$isItemsNotEquals = $item->getId() !== $ingredient->getId() ||
-						($item->getDamage() !== $ingredient->getDamage() && $ingredient->getDamage() !== 32767 &&
-						$ingredient->getDamage() !== -1) || $item->getCount() < $ingredient->getCount();
+						$item->getDamage() !== $ingredient->getDamage() ||
+						$item->getCount() < $ingredient->getCount();
 					if($isItemsNotEquals){
 						continue 3;
 					}
@@ -3136,6 +3140,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 		if($recipe === null){
 			$this->server->getLogger()->debug("Received bad recipe from " . $this->username);
+			return true;
+		}
+		$this->server->getPluginManager()->callEvent($ev = new CraftItemEvent($this, $ingredients, $recipe));
+		if($ev->isCancelled()){
+			$this->inventory->addItem(...$ingredients);
+			$this->craftingGrid->clearAll();
+			$this->sendAllInventories();
 			return true;
 		}
 		$this->craftingGrid->setItem(CraftingGrid::RESULT_INDEX, $recipe->getResult());
@@ -3976,9 +3987,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	}
 
 	public function resetCraftingGridType(){
-		if(count($ingredients = $this->craftingGrid->getContents()) > 0){
-			$this->inventory->addItem(...$ingredients);
-		}
 		$this->craftingGrid = new CraftingGrid($this);
 		$this->craftingType = self::CRAFTING_SMALL;
 	}

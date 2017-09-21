@@ -136,8 +136,10 @@ class Potion extends Item{
 			$entity->addEffect($effect[0]);
 		}
 
- 		if($entity->isSurvival())
- 			$entity->getInventory()->setItemInHand(Item::get(Item::GLASS_BOTTLE, 1));
+ 		if($entity->isSurvival()){
+			$entity->getInventory()->setItemInHand(Item::get(Item::AIR, 0, 0));
+ 			$entity->getInventory()->addItem(Item::get(Item::GLASS_BOTTLE, 0, 1));
+		}
 	}
 
 	public function getEffects(){
