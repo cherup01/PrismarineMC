@@ -3026,6 +3026,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		if($packet->windowId === 255){
 			$this->awardAchievement("openInventory");
+			$this->resetCraftingGridType();
 			return true;
 		}
 

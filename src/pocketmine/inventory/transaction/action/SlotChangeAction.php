@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\inventory\transaction\action;
 
 use pocketmine\inventory\ContainerInventory;
-use pocketmine\inventory\CraftingGrid;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\item\Item;
@@ -92,7 +91,7 @@ class SlotChangeAction extends InventoryAction{
 	 * @return bool
 	 */
 	public function isValid(Player $source) : bool{
-		if($this->inventorySlot < 0 or $this->inventory instanceof CraftingGrid){ //TODO: Anti-cheat
+		if($this->inventorySlot < 0){ //TODO: Anti-cheat
 			return true;
 		}
 		$check = $this->inventory->getItem($this->inventorySlot);
