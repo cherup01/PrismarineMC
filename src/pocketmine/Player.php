@@ -3024,6 +3024,11 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			return true;
 		}
 
+		if($packet->windowId === 255){
+			$this->awardAchievement("openInventory");
+			return true;
+		}
+
 		$this->resetCraftingGridType();
 
 		if(isset($this->windowIndex[$packet->windowId])){
@@ -3085,54 +3090,49 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 
 		$craftSlots = $this->craftingGrid->getContents();
-		try{
-			if($recipe instanceof ShapedRecipe){
-				$ingredients = [];
-				$itemGrid = $recipe->getIngredientMap();
-				// convert map into list
-				foreach($itemGrid as $line){
-					foreach($line as $item){
-						$ingredients[] = $item;
-					}
+		if($recipe instanceof ShapedRecipe){
+			$ingredients = [];
+			$itemGrid = $recipe->getIngredientMap();
+			foreach($itemGrid as $line){
+				foreach($line as $item){
+					$ingredients[] = $item;
 				}
-			}elseif($recipe instanceof ShapelessRecipe){
-				$ingredients = $recipe->getIngredientList();
 			}
-			$ingredientsCount = count($ingredients);
-			$firstIndex = 0;
-			foreach($craftSlots as &$item){
-				if($item === null or $item->getId() == Item::AIR){
+		}elseif($recipe instanceof ShapelessRecipe){
+			$ingredients = $recipe->getIngredientList();
+		}
+		$ingredientsCount = count($ingredients);
+		$firstIndex = 0;
+		foreach($craftSlots as &$item){
+			if($item === null or $item->getId() === Item::AIR){
+				continue;
+			}
+			for($i = $firstIndex; $i < $ingredientsCount; $i++){
+				$ingredient = $ingredients[$i];
+				if($ingredient->getId() === Item::AIR){
 					continue;
 				}
-				for($i = $firstIndex; $i < $ingredientsCount; $i++){
-					$ingredient = $ingredients[$i];
-					if($ingredient->getId() === Item::AIR){
-						continue;
-					}
-					$isItemsNotEquals = $item->getId() != $ingredient->getId() || 
-							($item->getDamage() != $ingredient->getDamage() && $ingredient->getDamage() != 32767) || 
-							$item->count < $ingredient->count;
-					if($isItemsNotEquals){
-						$this->server->getLogger()->debug("Recieved bad recipe from player ".$this->username);
-						return true;
-					}
-					$firstIndex = $i + 1;
-					$item->count -= $ingredient->count;
-					if ($item->count == 0) {
-						$item = Item::get(Item::AIR, 0, 0);
-					}
-					break;
+				$isItemsNotEquals = $item->getId() !== $ingredient->getId() ||
+					($item->getDamage() !== $ingredient->getDamage() && $ingredient->getDamage() !== 32767 &&
+					$ingredient->getDamage() !== -1) || $item->getCount() < $ingredient->getCount();
+				if($isItemsNotEquals){
+					$this->server->getLogger()->debug("Recieved bad recipe from player ".$this->username);
+					return true;
 				}
-			}
-			$this->craftingGrid->setItem(CraftingGrid::RESULT_INDEX, $recipe->getResult());
-			foreach($craftSlots as $slot => $item){
-				if($item === null) {
-					continue;
+				$firstIndex = $i + 1;
+				$item->setCount($item->getCount() - $ingredient->getCount());
+				if($item->getCount() === 0){
+					$item = Item::get(Item::AIR, 0, 0);
 				}
-				$this->craftingGrid->setItem($slot, $item);
+				break;
 			}
-		}catch(\Exception $e){
-			var_dump($e->getMessage());
+		}
+		$this->craftingGrid->setItem(CraftingGrid::RESULT_INDEX, $recipe->getResult());
+		foreach($craftSlots as $slot => $item){
+			if($item === null){
+				continue;
+			}
+			$this->craftingGrid->setItem($slot, $item);
 		}
 
 		switch($recipe->getResult()->getId()){
@@ -3965,14 +3965,10 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	}
 
 	public function resetCraftingGridType(){
-		$contents = $this->craftingGrid->getContents();
-		if(count($contents) > 0){
-			$this->inventory->addItem(...$contents);
-			$this->craftingGrid->clearAll();
+		if(count($ingredients = $this->craftingGrid->getContents()) > 0){
+			$this->inventory->addItem(...$ingredients);
 		}
-		if($this->craftingGrid instanceof BigCraftingGrid){
-			$this->craftingGrid = new CraftingGrid($this);
-		}
+		$this->craftingGrid = new CraftingGrid($this);
 		$this->craftingType = self::CRAFTING_SMALL;
 	}
 

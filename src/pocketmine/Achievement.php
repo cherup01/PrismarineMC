@@ -34,13 +34,14 @@ abstract class Achievement{
 	 * @var array[]
 	 */
 	public static $list = [
-		/*"openInventory" => array(
+		"openInventory" => [
 			"name" => "Taking Inventory",
 			"requires" => [],
-		),*/
+		],
 		"mineWood" => [
 			"name" => "Getting Wood",
-			"requires" => [ //"openInventory",
+			"requires" => [
+				"openInventory"
 			]
 		],
 		"buildWorkBench" => [
