@@ -1,7 +1,7 @@
 Prismarine [![Build Status](https://travis-ci.org/PrismarineMC/Prismarine.svg?branch=master)](https://travis-ci.org/PrismarineMC/Prismarine) [![CircleCI](https://circleci.com/gh/PrismarineMC/Prismarine.svg?style=svg)](https://circleci.com/gh/PrismarineMC/Prismarine)
 ===================
 
-__An server software for Minecraft: Bedrock Engine 1.2__
+__An server software for Minecraft: Bedrock Engine v1.2__
 
 **WARNING! This server software isn't compatible with Minecraft: Java Edition**
 
@@ -39,7 +39,7 @@ Get Prismarine
 * Download the latest build from [Circle CI](https://circleci.com/gh/PrismarineMC/Prismarine).
 * PHP Binaries [here](https://github.com/LeverylTeam/PHP7-Binaries).
 <!--* Installation instructions can be found in the [wiki](https://github.com/iTXTech/Genisys/wiki).-->
-NOTE: **The master and mcpe1.1 branches is the only officially supported.**
+NOTE: **The master and mcpe1.1 branches are the only officially supported.**
 _All other branches are in testing and may be unstable. Do not use builds from other branches unless you are sure you understand the risks._
 
 Tools
