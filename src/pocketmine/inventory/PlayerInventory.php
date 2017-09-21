@@ -298,7 +298,7 @@ class PlayerInventory extends BaseInventory{
 			return;
 		}
 		
-		if($index === self::CURSOR_INDEX){
+		if($index === self::CURSOR_INDEX and $send){
 			$this->sendCursor();
 			return;
 		}
