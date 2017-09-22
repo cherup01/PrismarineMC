@@ -1829,9 +1829,11 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		$this->achievements = [];
 
-		/** @var ByteTag $achievement */
-		foreach($this->namedtag->Achievements as $achievement){
-			$this->achievements[$achievement->getName()] = $achievement->getValue() !== 0;
+		if(isset($this->namedtag->Achievements)){
+			/** @var ByteTag $achievement */
+			foreach($this->namedtag->Achievements as $achievement){
+				$this->achievements[$achievement->getName()] = $achievement->getValue() !== 0;
+			}
 		}
 
 		$this->namedtag->lastPlayed = new LongTag("lastPlayed", (int) floor(microtime(true) * 1000));
@@ -3592,6 +3594,10 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 				$this->server->getPluginManager()->unsubscribeFromPermission(Server::BROADCAST_CHANNEL_ADMINISTRATIVE, $this);
 
 				$this->stopSleep();
+
+				if(count($contents = $this->craftingGrid->getContents()) > 0){
+					$this->inventory->addItem(...$contents);
+				}
 
 				if($this->joined){
 					try{
