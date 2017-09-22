@@ -9,6 +9,7 @@ server.properties
 *.txt
 prismarine.yml
 crashdumps/*
+resource_packs/*
 
 # Common IDEs
 .idea/*
