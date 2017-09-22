@@ -3112,12 +3112,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 					if($ingredient->getId() === Item::AIR){
 						continue;
 					}
-					if($ingredient->getDamage() === -1 or $ingredient->getDamage() === 32767){
-						$ingredient->setDamage($item->getDamage());
-						$ingredients[$i] = $ingredient;
-					}
 					$isItemsNotEquals = $item->getId() !== $ingredient->getId() ||
-						$item->getDamage() !== $ingredient->getDamage() ||
+						($item->getDamage() !== $ingredient->getDamage() &&
+						$ingredient->getDamage() !== -1 && $ingredient->getDamage() !== 32767) ||
 						$item->getCount() < $ingredient->getCount();
 					if($isItemsNotEquals){
 						continue 3;
@@ -3140,7 +3137,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 		$this->server->getPluginManager()->callEvent($ev = new CraftItemEvent($this, $ingredients, $recipe));
 		if($ev->isCancelled()){
-			$this->inventory->addItem(...$ingredients);
 			$this->craftingGrid->clearAll();
 			$this->sendAllInventories();
 			return true;
