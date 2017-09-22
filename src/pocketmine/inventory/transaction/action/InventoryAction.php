@@ -75,6 +75,15 @@ abstract class InventoryAction{
 	abstract public function isValid(Player $source) : bool;
 
 	/**
+	 * @param Player $source
+	 *
+	 * @return bool
+	 */
+	public function isAlreadyDone(Player $source) : bool{
+		return false;
+	}
+
+	/**
 	 * Performs actions needed to complete the inventory-action server-side. Returns if it was successful. Will return
 	 * false if plugins cancelled events. This will only be called if the transaction which it is part of is considered
 	 * valid.
