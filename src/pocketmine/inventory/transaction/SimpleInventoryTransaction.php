@@ -106,10 +106,6 @@ class SimpleInventoryTransaction implements InventoryTransaction{
 				$needItems[] = $action->getTargetItem();
 			}
 
-			if(!$action->isValid($this->source)){
-				return false;
-			}
-
 			if($action->getSourceItem()->getId() !== Item::AIR){
 				$haveItems[] = $action->getSourceItem();
 			}
@@ -155,7 +151,14 @@ class SimpleInventoryTransaction implements InventoryTransaction{
 			return false;
 		}
 
-		foreach($this->actions as $action){
+		$actions = $this->actions;
+		foreach($actions as $action){
+			if(!$action->isValid($this->source) or $action->isAlreadyDone($this->source)){
+				unset($actions[spl_object_hash($action)]);
+			}
+		}
+
+		foreach($actions as $action){
 			if($action->execute($this->source)){
 				$action->onExecuteSuccess($this->source);
 			}else{
