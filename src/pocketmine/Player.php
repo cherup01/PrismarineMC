@@ -1922,9 +1922,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		$this->sendCommandData();
 
-		if($this->isCreative()){
-			$this->inventory->sendCreativeContents();
-		}
+		$this->inventory->sendCreativeContents();
 
 		$this->server->addOnlinePlayer($this);
 
