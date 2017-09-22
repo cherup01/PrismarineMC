@@ -1,5 +1,5 @@
 @echo off
-TITLE Prismarine server software for Minecraft: Bedrock Edition
+TITLE Prismarine server software for Minecraft: Bedrock Engine
 cd /d %~dp0
 
 if exist bin\php\php.exe (
