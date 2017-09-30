@@ -262,6 +262,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	protected $iusername = "";
 	protected $displayName = "";
 	protected $languageCode = "en_UK";
+	protected $xuid = "";
 	protected $startAction = -1;
 	/** @var Vector3|null */
 	protected $sleeping = null;
@@ -728,7 +729,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	public function setDisplayName(string $name){
 		$this->displayName = $name;
 		if($this->spawned){
-			$this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getDisplayName(), $this->getSkin());
+			$this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getDisplayName(), $this->getSkin(), $this->getXboxUID());
 		}
 	}
 
@@ -1963,6 +1964,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$this->setDataProperty(self::DATA_NAMETAG, self::DATA_TYPE_STRING, $this->username, false);
 
 		$this->languageCode = $packet->languageCode;
+
+		$this->xuid = $packet->xuid;
 
 		if($this->server->getConfigBoolean("online-mode", true) && $packet->identityPublicKey === null){
 			$this->kick("disconnectionScreen.notAuthenticated", false);
@@ -3739,8 +3742,17 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	 *
 	 * @return string
 	 */
-	public function getLanguageCode(): string{
+	public function getLanguageCode() : string{
 		return $this->languageCode;
+	}
+
+	/**
+	 * Gets player's Xbox UID
+	 *
+	 * @return string
+	 */
+	public function getXboxUID() : string{
+		return $this->xuid;
 	}
 
 	/**

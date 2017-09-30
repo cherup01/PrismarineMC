@@ -49,6 +49,8 @@ class LoginPacket extends DataPacket{
 
 	public $languageCode;
 
+	public $xuid = "";
+
 	public function canBeSentBeforeLogin() : bool{
 		return true;
 	}
@@ -74,9 +76,12 @@ class LoginPacket extends DataPacket{
 				if(isset($webtoken["extraData"]["identity"])){
 					$this->clientUUID = $webtoken["extraData"]["identity"];
 				}
+				if(isset($webtoken["extraData"]["XUID"])){
+					$this->xuid = $webtoken["extraData"]["XUID"];
+				}
 			}
-			if ($verified and isset($webtoken["identityPublicKey"])){
-				if ($webtoken["identityPublicKey"] != self::MOJANG_PUBKEY){
+			if($verified and isset($webtoken["identityPublicKey"])){
+				if($webtoken["identityPublicKey"] != self::MOJANG_PUBKEY){
 					$this->identityPublicKey = $webtoken["identityPublicKey"];
 				}
 			}
@@ -89,7 +94,7 @@ class LoginPacket extends DataPacket{
 		$this->clientId = $this->clientData["ClientRandomId"] ?? null;
 		$this->serverAddress = $this->clientData["ServerAddress"] ?? null;
 
-		if (isset($this->clientData["LanguageCode"])) {
+		if(isset($this->clientData["LanguageCode"])){
 			$this->languageCode = $this->clientData["LanguageCode"];
 		}
  	}
