@@ -160,6 +160,16 @@ class CraftingManager{
 	}
 
 	/**
+	 * Removes all recipes
+	 */
+	public function clearAllRecipes(){
+		$this->recipes = [];
+		$this->recipeLookup = [];
+
+		$this->craftingDataCache = null;
+	}
+
+	/**
 	 * @param Item $item
 	 * @return Recipe[]
 	 */
