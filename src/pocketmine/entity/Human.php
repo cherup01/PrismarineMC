@@ -41,6 +41,7 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
+use pocketmine\network\mcpe\protocol\PlayerSkinPacket;
 use pocketmine\Player;
 use pocketmine\utils\UUID;
 
@@ -65,8 +66,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	public $height = 1.8;
 	public $eyeHeight = 1.62;
 
-	protected $skinId;
-	protected $skin = "";
+	/** @var Skin */
+	protected $skin;
 
 	protected $foodTickTimer = 0;
 
@@ -76,19 +77,26 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	protected $baseOffset = 1.62;
 
 	public function __construct(Level $level, CompoundTag $nbt){
-		if($this->skin === "" and (!isset($nbt->Skin) or !isset($nbt->Skin->Data) or !Player::isValidSkin($nbt->Skin->Data->getValue()))){
+		if($this->skin === null and (!isset($nbt->Skin) or !isset($nbt->Skin->Data) or !Player::isValidSkin($nbt->Skin->Data->getValue()))){
 			throw new \InvalidStateException((new \ReflectionClass($this))->getShortName() . " must have a valid skin set");
 		}
 
 		parent::__construct($level, $nbt);
 	}
 
-	public function getSkinData(){
+	public function getSkin() : Skin{
 		return $this->skin;
 	}
 
-	public function getSkinId(){
-		return $this->skinId;
+	/**
+	 * Checks the length of a supplied skin bitmap and returns whether the length is valid.
+	 *
+	 * @param string $skin
+	 *
+	 * @return bool
+	 */
+	public static function isValidSkin(string $skin) : bool{
+		return strlen($skin) === 64 * 64 * 4 or strlen($skin) === 64 * 32 * 4;
 	}
 
 	/**
@@ -106,16 +114,28 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	}
 
 	/**
-	 * @param string $str
-	 * @param string $skinId
+	 * @param Skin $skin
 	 */
-	public function setSkin(string $str, string $skinId){
-		if(!Player::isValidSkin($str)){
+	public function setSkin(Skin $skin, bool $send = false){
+		if(!$skin->isValid()){
 			throw new \InvalidStateException("Specified skin is not valid, must be 8KiB or 16KiB");
 		}
 
-		$this->skin = $str;
-		$this->skinId = $skinId;
+		$this->skin = $skin;
+
+		if($send){
+			$this->sendSkin($this->getViewers());
+		}
+	}
+
+	/**
+	 * @param Player[] $targets
+	 */
+	public function sendSkin(array $targets){
+		$pk = new PlayerSkinPacket();
+		$pk->uuid = $this->getUniqueId();
+		$pk->skin = $this->skin;
+		$this->server->broadcastPacket($targets, $pk);
 	}
 
 	public function jump(){
@@ -316,10 +336,13 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		}
 
 		if(isset($this->namedtag->Skin) and $this->namedtag->Skin instanceof CompoundTag){
-			$this->setSkin($this->namedtag->Skin["Data"], $this->namedtag->Skin["Name"]);
+			$this->setSkin(new Skin(
+				$this->namedtag->Skin["Name"],
+				$this->namedtag->Skin["Data"]
+			));
 		}
 
-		$this->uuid = UUID::fromData((string) $this->getId(), $this->getSkinData(), $this->getNameTag());
+		$this->uuid = UUID::fromData((string) $this->getId(), $this->skin->getSkinData(), $this->getNameTag());
 	}
 
 	protected function initEntity(){
@@ -517,10 +540,10 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			$this->namedtag->SelectedInventorySlot = new IntTag("SelectedInventorySlot", $this->inventory->getHeldItemIndex());
 		}
 
-		if(strlen($this->getSkinData()) > 0){
+		if($this->skin !== null){
 			$this->namedtag->Skin = new CompoundTag("Skin", [
-				new StringTag("Data", $this->getSkinData()),
-				new StringTag("Name", $this->getSkinId())
+				new StringTag("Data", $this->skin->getSkinData()),
+				new StringTag("Name", $this->skin->getSkinId())
 			]);
 		}
 	}
@@ -529,12 +552,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		if($player !== $this and !isset($this->hasSpawned[$player->getLoaderId()])){
 			$this->hasSpawned[$player->getLoaderId()] = $player;
 
-			if(!Player::isValidSkin($this->skin)){
+			if(!$this->skin->isValid()){
 				throw new \InvalidStateException((new \ReflectionClass($this))->getShortName() . " must have a valid skin set");
-			}
-
-			if(!($this instanceof Player)){
-				$this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), $this->getName(), $this->skinId, $this->skin, [$player]);
 			}
 
 			$pk = new AddPlayerPacket();
@@ -552,7 +571,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			$this->inventory->sendArmorContents($player);
 
 			if(!($this instanceof Player)){
-				$this->server->removePlayerListData($this->getUniqueId(), [$player]);
+				$this->sendSkin([$player]);
 			}
 		}
 	}

@@ -42,9 +42,6 @@ class LoginPacket extends DataPacket{
 	public $identityPublicKey;
 	public $serverAddress;
 
-	public $skinId;
-	public $skin = "";
-
 	public $chainData;
 	public $clientData;
 	public $clientDataJwt;
@@ -91,11 +88,7 @@ class LoginPacket extends DataPacket{
 
 		$this->clientId = $this->clientData["ClientRandomId"] ?? null;
 		$this->serverAddress = $this->clientData["ServerAddress"] ?? null;
-		$this->skinId = $this->clientData["SkinId"] ?? null;
 
-		if(isset($this->clientData["SkinData"])) {
-			$this->skin = base64_decode($this->clientData["SkinData"]);
-		}
 		if (isset($this->clientData["LanguageCode"])) {
 			$this->languageCode = $this->clientData["LanguageCode"];
 		}
