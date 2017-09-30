@@ -3610,8 +3610,10 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 				$this->stopSleep();
 
-				if(count($contents = $this->craftingGrid->getContents()) > 0){
-					$this->inventory->addItem(...$contents);
+				if($this->craftingGrid !== null){
+					if(count($contents = $this->craftingGrid->getContents()) > 0){
+						$this->inventory->addItem(...$contents);
+					}
 				}
 
 				if($this->joined){
