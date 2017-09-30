@@ -792,7 +792,7 @@ abstract class Entity extends Location implements Metadatable{
 
 		$this->namedtag->Pos = new ListTag("Pos", [
 			new DoubleTag("", $this->x),
-			new DoubleTag("", $this->y + 1),
+			new DoubleTag("", $this->y),
 			new DoubleTag("", $this->z)
 		]);
 
