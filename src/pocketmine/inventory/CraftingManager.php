@@ -165,8 +165,8 @@ class CraftingManager{
 	 */
 	public function getRecipesByResult(Item $item) : array{
 		$result = [];
-		foreach($this->recipes as $recipe){
-			if($recipe->getResult()->equals($item) and $recipe->getResult()->getCount() === $item->getCount()){
+		foreach($this->recipeLookup[$item->getId() . ":" . $item->getDamage()] as $recipe){
+			if($recipe->getResult()->getCount() === $item->getCount()){
 				$result[] = $recipe;
 			}
 		}
