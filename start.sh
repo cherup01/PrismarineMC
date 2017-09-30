@@ -37,8 +37,8 @@ fi
 if [ "$POCKETMINE_FILE" == "" ]; then
 	if [ -f ./PocketMine-MP.phar ]; then
 		POCKETMINE_FILE="./PocketMine-MP.phar"
-	elif [ -f ./Prismarine*.phar ]; then
-		POCKETMINE_FILE=$(basename "./Prismarine*.phar")
+	elif [ -f ./Prismarine_1.2.0.phar ]; then
+		POCKETMINE_FILE="./Prismarine_1.2.0.phar"
 	elif [ -f ./src/pocketmine/PocketMine.php ]; then
 		POCKETMINE_FILE="./src/pocketmine/PocketMine.php"
 	else
