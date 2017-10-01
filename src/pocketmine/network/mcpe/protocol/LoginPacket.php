@@ -59,7 +59,10 @@ class LoginPacket extends DataPacket{
 		$this->protocol = $this->getInt();
 
 		if($this->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
-			$this->buffer = null;
+			if($this->protocol > 0xffff){
+				$this->offset -= 6;
+				$this->protocol = $this->getInt();
+			}
 			return; //Do not attempt to decode for non-accepted protocols
 		}
 

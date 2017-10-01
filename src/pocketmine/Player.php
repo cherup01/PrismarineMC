@@ -214,6 +214,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	 */
 	protected $sessionAdapter;
 
+	/** @var int */
+	protected $protocol = -1;
+
 	/** @var bool */
 	public $playedBefore;
 	public $spawned = false;
@@ -1945,6 +1948,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			return false;
 		}
 
+		$this->protocol = $packet->protocol;
+
 		if($packet->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
 			if($packet->protocol < ProtocolInfo::CURRENT_PROTOCOL){
 				$message = "disconnectionScreen.outdatedClient";
@@ -2018,6 +2023,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 	public function sendPlayStatus(int $status, bool $immediate = false){
 		$pk = new PlayStatusPacket();
+		$pk->protocol = $this->protocol;
 		$pk->status = $status;
 		if($immediate){
 			$this->directDataPacket($pk);

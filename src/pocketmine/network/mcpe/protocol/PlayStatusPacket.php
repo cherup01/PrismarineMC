@@ -42,6 +42,9 @@ class PlayStatusPacket extends DataPacket{
 	/** @var int */
 	public $status;
 
+	/** @var int */
+	public $protocol;
+
 	protected function decodePayload(){
 		$this->status = $this->getInt();
 	}
@@ -52,6 +55,14 @@ class PlayStatusPacket extends DataPacket{
 
 	protected function encodePayload(){
 		$this->putInt($this->status);
+	}
+
+	protected function encodeHeader(){
+		if($this->protocol < 130){
+			$this->putByte(static::NETWORK_ID);
+		}else{
+			parent::encodeHeader();
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{
