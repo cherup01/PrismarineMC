@@ -686,6 +686,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$this->allowInstaBreak = (bool) $this->server->getProperty("player.anti-cheat.allow-instabreak", false);
 
 		$this->sessionAdapter = new PlayerNetworkSessionAdapter($this->server, $this);
+
+		$this->protocol = ProtocolInfo::CURRENT_PROTOCOL;
 	}
 
 	/**
@@ -3605,6 +3607,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 				if($notify and strlen($reason) > 0){
 					$pk = new DisconnectPacket();
 					$pk->message = $reason;
+					$pk->protocol = $this->protocol;
 					$this->directDataPacket($pk);
 				}
 
