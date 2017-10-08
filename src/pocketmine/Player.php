@@ -1886,7 +1886,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$pk->entityRuntimeId = $this->id;
 		$pk->playerGamemode = Player::getClientFriendlyGamemode($this->gamemode);
 
-		$pk->playerPosition = $this->getOffsetPosition();
+		$pk->playerPosition = $this->getOffsetPosition()->add(0, 0.85, 0);
 
 		$pk->pitch = $this->pitch;
 		$pk->yaw = $this->yaw;
@@ -3952,7 +3952,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		$pk = new MovePlayerPacket();
 		$pk->entityRuntimeId = $this->getId();
-		$pk->position = $this->getOffsetPosition();
+		$pk->position = $pos->add(0, $this->baseOffset, 0);
 		$pk->bodyYaw = $yaw;
 		$pk->pitch = $pitch;
 		$pk->yaw = $yaw;
