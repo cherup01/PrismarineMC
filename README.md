@@ -5,6 +5,10 @@ __An server software for Minecraft: Bedrock Engine v1.2__
 
 **WARNING! This server software isn't compatible with Minecraft: Java Edition**
 
+## If you want one Software in Java, more better and more Performance you can use Nukkit: https://github.com/Nukkit/Nukkit
+
+## Nukkit-Help Group Discord. [Helping, Performance, Informations] : https://discordapp.com/invite/7y8WM4F
+
 Introduction
 -------------
 Prismarine is a server software based on **[PocketMine-MP](https://github.com/pmmp/PocketMine-MP)** with extended functionality. Most of the original code was written by **PocketMine Team**.<br>
