@@ -78,20 +78,8 @@ class WoodenSlab extends Transparent{
 		}
 	}
 
-	public function canBePlacedAt(Block $blockReplace, Vector3 $clickVector, int $face, bool $isClickedBlock) : bool{
-		if(parent::canBePlacedAt($blockReplace, $clickVector, $face, $isClickedBlock)){
-			return true;
-		}
-
-		if($blockReplace->getId() === $this->getId() and $blockReplace->getVariant() === $this->getVariant()){
-			if(($blockReplace->getDamage() & 0x08) !== 0){ //Trying to combine with top slab
-				return $clickVector->y <= 0.5 or (!$isClickedBlock and $face === Vector3::SIDE_UP);
-			}else{
-				return $clickVector->y >= 0.5 or (!$isClickedBlock and $face === Vector3::SIDE_DOWN);
-			}
-		}
-
-		return false;
+	public function canBeReplaced(Block $with = null) : bool{
+		return $with !== null and $with->getId() === $this->getId() and ($with->getDamage() & 0x07) === ($this->getDamage() & 0x07);
 	}
 
 	public function place(Item $item, Block $block, Block $target, int $face, Vector3 $facePos, Player $player = null) : bool{
