@@ -18,6 +18,8 @@ before_script:
  - make install
  - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+ - mkdir plugins
+ - wget -O plugins/DevTools.phar https://raw.githubusercontent.com/PrismarineMC/Prismarine/master/build/DevTools.phar
 
 script:
  - php build.php
