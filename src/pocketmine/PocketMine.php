@@ -81,7 +81,7 @@ namespace pocketmine {
 	const NAME = "Prismarine";
 	const VERSION = "1.2.0";
 	const API_VERSION = "3.0.0";
-	const CODENAME = "Pumpkin Pie";
+	const CODENAME = "Cake";
 
 	/*
 	 * Startup code. Do not look at it, it may harm you.
@@ -90,8 +90,8 @@ namespace pocketmine {
 	 * Enjoy it as much as I did writing it. I don't want to do it again.
 	 */
 
-	if(version_compare("7.0", PHP_VERSION) > 0){
-		echo "[CRITICAL] You must use PHP >= 7.0" . PHP_EOL;
+	if(version_compare("7.2", PHP_VERSION) > 0){
+		echo "[CRITICAL] You must use PHP >= 7.2" . PHP_EOL;
 		echo "[CRITICAL] Please use the installer provided on the homepage." . PHP_EOL;
 		exit(1);
 	}
@@ -202,8 +202,12 @@ namespace pocketmine {
 		$timezone = ini_get("date.timezone");
 		if(strpos($timezone, "/") === false){
 			$default_timezone = timezone_name_from_abbr($timezone);
-			ini_set("date.timezone", $default_timezone);
-			date_default_timezone_set($default_timezone);
+			if($default_timezone !== false){
+				ini_set("date.timezone", $default_timezone);
+				date_default_timezone_set($default_timezone);
+			}else{
+				$logger->warning("Timezone \"$timezone\" could not be parsed as a valid timezone from php.ini, falling back to auto-detection");
+			}
 		}else{
 			date_default_timezone_set($timezone);
 		}
