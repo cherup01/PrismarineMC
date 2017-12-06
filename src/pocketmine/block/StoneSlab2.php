@@ -17,41 +17,27 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 declare(strict_types=1);
 
 namespace pocketmine\block;
 
-use pocketmine\item\Tool;
+class StoneSlab2 extends StoneSlab{
 
-class WoodenSlab extends Slab{
+	const TYPE_RED_SANDSTONE = 0;
+	const TYPE_PURPUR = 1;
 
-	protected $id = self::WOODEN_SLAB;
+	protected $id = self::STONE_SLAB2;
 
-	protected $doubleId = self::DOUBLE_WOODEN_SLAB;
-
-	public function getHardness() : float{
-		return 2;
-	}
+	protected $doubleId = self::DOUBLE_STONE_SLAB2;
 
 	public function getName() : string{
 		static $names = [
-			0 => "Oak",
-			1 => "Spruce",
-			2 => "Birch",
-			3 => "Jungle",
-			4 => "Acacia",
-			5 => "Dark Oak"
+			self::TYPE_RED_SANDSTONE => "Red Sandstone",
+			self::TYPE_PURPUR => "Purpur"
 		];
-		return (($this->meta & 0x08) === 0x08 ? "Upper " : "") . ($names[$this->meta & 0x07] ?? "") . " Wooden Slab";
-	}
 
-	public function getToolType() : int{
-		return Tool::TYPE_AXE;
-	}
-
-	public function getFuelTime() : int{
-		return 300;
+		return (($this->meta & 0x08) > 0 ? "Upper " : "") . ($names[$this->getVariant()] ?? "") . " Slab";
 	}
 }
