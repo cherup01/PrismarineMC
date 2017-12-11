@@ -45,7 +45,7 @@ class DropItemTransaction extends BaseTransaction{
 		//Nothing to update
 	}
 
-	public function getInventory(){
+	public function getInventory(): Inventory{
 		return null;
 	}
 
