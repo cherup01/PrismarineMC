@@ -61,7 +61,7 @@ class BaseTransaction implements Transaction{
 		return $this->creationTime;
 	}
 
-	public function getInventory() : Inventory{
+	public function getInventory(){
 		return $this->inventory;
 	}
 
