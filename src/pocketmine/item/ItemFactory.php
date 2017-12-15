@@ -288,7 +288,7 @@ class ItemFactory{
 			}elseif(is_numeric($b[0]){
 				$item = self::get($b[0] & 0xFFFF, $meta);
 			}else{
-				return false;
+				return self::get(Item::AIR, 0, 0);
 			}
 
 			return $item;
