@@ -2683,7 +2683,7 @@ class Level implements ChunkManager, Metadatable{
 				$y = (int) min($max - 2, $v->y);
 				$wasAir = ($chunk->getBlockId($x & 0x0f, $y - 1, $z & 0x0f) === 0);
 				for(; $y > 0; --$y){
-					$b = $chunk->getFullBlock($x, $y, $z);
+					$b = $chunk->getFullBlock($x & 0x0f, $y, $z & 0x0f);
 					$block = BlockFactory::get($b >> 4, $b & 0x0f);
 					if($this->isFullBlock($block)){
 						if($wasAir){
@@ -2696,10 +2696,10 @@ class Level implements ChunkManager, Metadatable{
 				}
 
 				for(; $y >= 0 and $y < $max; ++$y){
-					$b = $chunk->getFullBlock($x, $y + 1, $z);
+					$b = $chunk->getFullBlock($x & 0x0f, $y + 1, $z & 0x0f);
 					$block = BlockFactory::get($b >> 4, $b & 0x0f);
 					if(!$this->isFullBlock($block)){
-						$b = $chunk->getFullBlock($x, $y, $z);
+						$b = $chunk->getFullBlock($x & 0x0f, $y, $z & 0x0f);
 						$block = BlockFactory::get($b >> 4, $b & 0x0f);
 						if(!$this->isFullBlock($block)){
 							return new Position($spawn->x, $y === (int) $spawn->y ? $spawn->y : $y, $spawn->z, $this);
