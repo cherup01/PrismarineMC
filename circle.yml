@@ -10,7 +10,7 @@ checkout:
 
 dependencies:
  pre:
-  - sudo apt-get update; sudo apt-get install gcc
+  - sudo apt-get update; sudo apt-get install libstdc++6
  override:
   - mkdir plugins
   - cd 
