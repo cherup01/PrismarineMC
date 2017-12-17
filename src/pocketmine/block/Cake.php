@@ -36,15 +36,15 @@ class Cake extends Transparent implements FoodSource{
 
 	protected $id = self::CAKE_BLOCK;
 
-	public function __construct(int $meta = 0){
+	public function __construct($meta = 0){
 		$this->meta = $meta;
 	}
 
-	public function getHardness() : float{
+	public function getHardness(){
 		return 0.5;
 	}
 
-	public function getName() : string{
+	public function getName(){
 		return "Cake Block";
 	}
 
@@ -62,7 +62,7 @@ class Cake extends Transparent implements FoodSource{
 		);
 	}
 
-	public function place(Item $item, Block $block, Block $target, int $face, Vector3 $facePos, Player $player = null) : bool{
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(Vector3::SIDE_DOWN);
 		if($down->getId() !== self::AIR){
 			$this->getLevel()->setBlock($block, $this, true, true);
@@ -73,10 +73,10 @@ class Cake extends Transparent implements FoodSource{
 		return false;
 	}
 
-	public function onUpdate(int $type){
+	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			if($this->getSide(Vector3::SIDE_DOWN)->getId() === self::AIR){ //Replace with common break method
-				$this->getLevel()->setBlock($this, BlockFactory::get(Block::AIR), true);
+				$this->getLevel()->setBlock($this, Block::get(Block::AIR), true);
 
 				return Level::BLOCK_UPDATE_NORMAL;
 			}
@@ -85,11 +85,11 @@ class Cake extends Transparent implements FoodSource{
 		return false;
 	}
 
-	public function getDrops(Item $item) : array{
+	public function getDrops(Item $item){
 		return [];
 	}
 
-	public function onActivate(Item $item, Player $player = null) : bool{
+	public function onActivate(Item $item, Player $player = null){
 		if($player instanceof Player and $player->getFood() < $player->getMaxFood()){
 			$player->getServer()->getPluginManager()->callEvent($ev = new EntityEatBlockEvent($player, $this));
 
@@ -120,7 +120,7 @@ class Cake extends Transparent implements FoodSource{
 		$clone = clone $this;
 		$clone->meta++;
 		if($clone->meta > 0x06){
-			$clone = BlockFactory::get(Block::AIR);
+			$clone = Block::get(Block::AIR);
 		}
 		return $clone;
 	}
