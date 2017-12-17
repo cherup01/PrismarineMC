@@ -5,6 +5,7 @@ php:
 
 branches:
  - master
+ - mcpe1.1
 
 before_script:
 # - pecl install channel://pecl.php.net/pthreads-3.1.6
