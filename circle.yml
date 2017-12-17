@@ -9,6 +9,8 @@ checkout:
    - git clone https://github.com/NycuRO/CI-Test
 
 dependencies:
+ pre:
+  - sudo apt-get update; sudo apt-get install build-essential
  override:
   - mkdir plugins
   - cd 
