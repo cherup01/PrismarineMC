@@ -1,4 +1,4 @@
-Prismarine [![Build Status](https://travis-ci.org/PrismarineMC/Prismarine.svg?branch=master)](https://travis-ci.org/PrismarineMC/Prismarine) [![CircleCI](https://circleci.com/gh/PrismarineMC/Prismarine.svg?style=svg)](https://circleci.com/gh/PrismarineMC/Prismarine)
+Prismarine [![Build Status](https://travis-ci.org/PrismarineMC/Prismarine.svg?branch=mcpe1.1)](https://travis-ci.org/PrismarineMC/Prismarine)
 ===================
 
 __An server software for Minecraft: Pocket Edition & Windows 10 Edition__
