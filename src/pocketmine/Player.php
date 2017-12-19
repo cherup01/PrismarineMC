@@ -2483,6 +2483,10 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 							$f = 1.1;
 							$potion = Entity::createEntity("ThrownPotion", $this->getLevel(), $nbt, $this);
 							$potion->setMotion($potion->getMotion()->multiply($f));
+							if($this->isSurvival()){
+								$item->setCount($item->getCount() - 1);
+								$this->inventory->setItemInHand($item->getCount() > 0 ? $item : Item::get(Item::AIR));
+							}
 							$this->server->getPluginManager()->callEvent($ev = new ProjectileLaunchEvent($potion));
 							if($ev->isCancelled()){
 								$potion->kill();
