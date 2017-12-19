@@ -245,6 +245,8 @@ class Item implements ItemIds, \JsonSerializable{
 			self::$list[self::BEETROOT_SEEDS] = BeetrootSeeds::class;
 			self::$list[self::BEETROOT_SOUP] = BeetrootSoup::class;
 
+			self::$list[self::SPLASH_POTION] = SplashPotion::class;
+
 			self::$list[self::ENCHANTED_GOLDEN_APPLE] = GoldenAppleEnchanted::class;
 		}
 
