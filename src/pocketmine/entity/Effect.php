@@ -335,19 +335,21 @@ class Effect{
 	public function applyEffect(Entity $entity){
 		switch($this->id){
 			case Effect::POISON:
-				if($entity->getHealth() > 1){
+				if($entity->getHealth() > 1 and !($entity instanceof Player and $entity->isCreative())){
 					$ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, 1);
 					$entity->attack($ev->getFinalDamage(), $ev);
 				}
 				break;
 
 			case Effect::WITHER:
-				$ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, 1);
-				$entity->attack($ev->getFinalDamage(), $ev);
+				if(!($entity instanceof Player and $entity->isCreative())){
+					$ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, 1);
+					$entity->attack($ev->getFinalDamage(), $ev);
+				}
 				break;
 
 			case Effect::REGENERATION:
-				if($entity->getHealth() < $entity->getMaxHealth()){
+				if($entity->getHealth() < $entity->getMaxHealth() and !($entity instanceof Player and $entity->isCreative())){
 					$ev = new EntityRegainHealthEvent($entity, 1, EntityRegainHealthEvent::CAUSE_MAGIC);
 					$entity->heal($ev->getAmount(), $ev);
 				}
@@ -360,16 +362,18 @@ class Effect{
 				break;
 			case Effect::INSTANT_HEALTH:
 				//TODO: add particles (witch spell)
-				if($entity->getHealth() < $entity->getMaxHealth()){
+				if($entity->getHealth() < $entity->getMaxHealth() and !($entity instanceof Player and $entity->isCreative())){
 					$amount = 2 * (2 ** ($this->getEffectLevel() % 32));
 					$entity->heal($amount, new EntityRegainHealthEvent($entity, $amount, EntityRegainHealthEvent::CAUSE_MAGIC));
 				}
 				break;
 			case Effect::INSTANT_DAMAGE:
 				//TODO: add particles (witch spell)
-				$amount = 2 * (2 ** ($this->getEffectLevel() % 32));
-				$entity->attack($amount, new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, $amount));
-				break;
+				if(!($entity instanceof Player and $entity->isCreative())){
+					$amount = 2 * (2 ** ($this->getEffectLevel() % 32));
+					$entity->attack($amount, new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, $amount));
+					break;
+				}
 		}
 	}
 

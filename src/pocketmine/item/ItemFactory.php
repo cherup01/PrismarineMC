@@ -187,6 +187,8 @@ class ItemFactory{
 			self::registerItem(new BeetrootSeeds());
 			self::registerItem(new BeetrootSoup());
 
+			self::registerItem(new SplashPotion());
+
 			self::registerItem(new GoldenAppleEnchanted());
 		}
 
@@ -209,7 +211,7 @@ class ItemFactory{
 	public static function registerItem(Item $item, bool $override = false){
 		$id = $item->getId();
 		if(!$override and self::$list[$id] !== null){
-			throw new \RuntimeException("Trying to overwrite an already registered item");
+			throw new \RuntimeException("Trying to overwrite an already registered item: $id");
 		}
 
 		self::$list[$id] = clone $item;
