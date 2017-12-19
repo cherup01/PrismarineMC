@@ -83,7 +83,7 @@ class Potion extends Item{
 
 	public function onConsume(Entity $entity){
 		if($this->getEffect() !== null){
-			$entity->addEffect($effect);
+			$entity->addEffect($this->getEffect());
 		}
 
  		if($entity->isSurvival()){
