@@ -3951,6 +3951,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		return -1;
 	}
+	
+	/**
+	 * @return Inventory[]
+	 */
+	public function getWindows(){
+		return $this->windowIndex;
+	}
 
 	/**
 	 * Returns the created/existing window id
