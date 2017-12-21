@@ -54,7 +54,9 @@ class DropItemTransaction extends BaseTransaction{
 	}
 
 	public function sendSlotUpdate(Player $source){
-		$source->getInventory()->sendContents($source);
+		foreach($source->getWindows() as $inv){
+			$inv->sendContents($source);
+		}
 	}
 
 	public function getChange(){
@@ -72,7 +74,6 @@ class DropItemTransaction extends BaseTransaction{
 			return false;
 		}
 		$source->dropItem($droppedItem);
-		$source->getInventory()->sendContents($source);
 		return true;
 	}
 }
