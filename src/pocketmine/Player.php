@@ -3378,6 +3378,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$ev = new PlayerDropItemEvent($this, $item);
 		$this->server->getPluginManager()->callEvent($ev);
 		if($ev->isCancelled()){
+			$this->inventory->addItem($item); //return this item to player's inventory
 			return;
 		}
 
