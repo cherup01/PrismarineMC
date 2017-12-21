@@ -54,7 +54,7 @@ class DropItemTransaction extends BaseTransaction{
 	}
 
 	public function sendSlotUpdate(Player $source){
-		//Nothing to update
+		$source->getInventory()->sendContents($source);
 	}
 
 	public function getChange(){
@@ -68,6 +68,8 @@ class DropItemTransaction extends BaseTransaction{
 			$source->getFloatingInventory()->removeItem($droppedItem);
 		}elseif($source->getInventory()->contains($droppedItem)){
 			$source->getInventory()->removeItem($droppedItem);
+		}elseif(!$source->getServer()->allowInventoryCheats and !$source->isCreative()){
+			return false;
 		}
 		$source->dropItem($droppedItem);
 		$source->getInventory()->sendContents($source);
