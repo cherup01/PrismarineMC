@@ -29,8 +29,11 @@ class StoneAxe extends Tool{
 		parent::__construct(self::STONE_AXE, $meta, $count, "Stone Axe");
 	}
 
-
 	public function isAxe(){
 		return Tool::TIER_STONE;
+	}
+
+	public function getAttackPoints() : int{
+		return 3;
 	}
 }

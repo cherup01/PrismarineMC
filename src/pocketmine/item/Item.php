@@ -859,6 +859,14 @@ class Item implements ItemIds, \JsonSerializable{
 		return 1;
 	}
 
+	public function getAttackPoints() : int{
+		return 1;
+	}
+
+	public function getArmorPoints() : int{
+		return 0;
+	}
+
 	/**
 	 * Called when a player uses this item on a block.
 	 *

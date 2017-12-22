@@ -2564,35 +2564,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 							}
 
 							$item = $this->inventory->getItemInHand();
-							$damageTable = [
-								Item::WOODEN_SWORD => 4,
-								Item::GOLDEN_SWORD => 4,
-								Item::STONE_SWORD => 5,
-								Item::IRON_SWORD => 6,
-								Item::DIAMOND_SWORD => 7,
-
-								Item::WOODEN_AXE => 3,
-								Item::GOLDEN_AXE => 3,
-								Item::STONE_AXE => 3,
-								Item::IRON_AXE => 5,
-								Item::DIAMOND_AXE => 6,
-
-								Item::WOODEN_PICKAXE => 2,
-								Item::GOLDEN_PICKAXE => 2,
-								Item::STONE_PICKAXE => 3,
-								Item::IRON_PICKAXE => 4,
-								Item::DIAMOND_PICKAXE => 5,
-
-								Item::WOODEN_SHOVEL => 1,
-								Item::GOLDEN_SHOVEL => 1,
-								Item::STONE_SHOVEL => 2,
-								Item::IRON_SHOVEL => 3,
-								Item::DIAMOND_SHOVEL => 4,
-							];
-
-							$damage = [
-								EntityDamageEvent::MODIFIER_BASE => $damageTable[$item->getId()] ?? 1,
-							];
 
 							if(!$this->canInteract($target, 8)){
 								$cancelled = true;
@@ -2602,40 +2573,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 								}elseif($this->server->getConfigBoolean("pvp") !== true or $this->server->getDifficulty() === 0){
 									$cancelled = true;
 								}
-
-								$armorValues = [
-									Item::LEATHER_CAP => 1,
-									Item::LEATHER_TUNIC => 3,
-									Item::LEATHER_PANTS => 2,
-									Item::LEATHER_BOOTS => 1,
-									Item::CHAINMAIL_HELMET => 1,
-									Item::CHAINMAIL_CHESTPLATE => 5,
-									Item::CHAINMAIL_LEGGINGS => 4,
-									Item::CHAINMAIL_BOOTS => 1,
-									Item::GOLDEN_HELMET => 1,
-									Item::GOLDEN_CHESTPLATE => 5,
-									Item::GOLDEN_LEGGINGS => 3,
-									Item::GOLDEN_BOOTS => 1,
-									Item::IRON_HELMET => 2,
-									Item::IRON_CHESTPLATE => 6,
-									Item::IRON_LEGGINGS => 5,
-									Item::IRON_BOOTS => 2,
-									Item::DIAMOND_HELMET => 3,
-									Item::DIAMOND_CHESTPLATE => 8,
-									Item::DIAMOND_LEGGINGS => 6,
-									Item::DIAMOND_BOOTS => 3,
-								];
-								$points = 0;
-								foreach($target->getInventory()->getArmorContents() as $index => $i){
-									if(isset($armorValues[$i->getId()])){
-										$points += $armorValues[$i->getId()];
-									}
-								}
-
-								$damage[EntityDamageEvent::MODIFIER_ARMOR] = -floor($damage[EntityDamageEvent::MODIFIER_BASE] * $points * 0.04);
 							}
 
-							$ev = new EntityDamageByEntityEvent($this, $target, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $damage);
+							$ev = new EntityDamageByEntityEvent($this, $target, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $item->getAttackPoints());
 							if($cancelled){
 								$ev->setCancelled();
 							}
