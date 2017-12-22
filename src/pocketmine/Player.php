@@ -2932,8 +2932,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 					break;
 				}
 
-				$this->resetCraftingGridType();
-
 				$this->server->getPluginManager()->callEvent($ev = new PlayerRespawnEvent($this, $this->getSpawn()));
 
 				$realSpawn = $ev->getRespawnPosition()->add(0.5, 0, 0.5);
@@ -3927,6 +3925,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			default:
 				break;
 		}
+
+		$this->resetCraftingGridType();
 
 		$this->server->getPluginManager()->callEvent($ev = new PlayerDeathEvent($this, $this->getDrops(), new TranslationContainer($message, $params)));
 
