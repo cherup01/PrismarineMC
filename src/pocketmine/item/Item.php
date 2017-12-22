@@ -245,6 +245,8 @@ class Item implements ItemIds, \JsonSerializable{
 			self::$list[self::BEETROOT_SEEDS] = BeetrootSeeds::class;
 			self::$list[self::BEETROOT_SOUP] = BeetrootSoup::class;
 
+			self::$list[self::SPLASH_POTION] = SplashPotion::class;
+
 			self::$list[self::ENCHANTED_GOLDEN_APPLE] = GoldenAppleEnchanted::class;
 		}
 
@@ -369,8 +371,10 @@ class Item implements ItemIds, \JsonSerializable{
 				if($item->getId() === self::AIR and strtoupper($b[0]) !== "AIR"){
 					$item = self::get($b[0] & 0xFFFF, $meta);
 				}
-			}else{
+			}elseif(is_numeric($b[0])){
 				$item = self::get($b[0] & 0xFFFF, $meta);
+			}else{
+				return self::get(self::AIR, 0, 0);
 			}
 
 			return $item;

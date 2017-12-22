@@ -50,10 +50,10 @@ class Cake extends Transparent implements FoodSource{
 
 	protected function recalculateBoundingBox(){
 
-		$f = (1 + $this->getDamage() * 2) / 16;
+		$f = $this->getDamage() * 0.125;
 
 		return new AxisAlignedBB(
-			$this->x + $f,
+			$this->x + 0.0625 + $f,
 			$this->y,
 			$this->z + 0.0625,
 			$this->x + 1 - 0.0625,
@@ -76,7 +76,7 @@ class Cake extends Transparent implements FoodSource{
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			if($this->getSide(Vector3::SIDE_DOWN)->getId() === self::AIR){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), true);
+				$this->getLevel()->setBlock($this, Block::get(Block::AIR), true);
 
 				return Level::BLOCK_UPDATE_NORMAL;
 			}
@@ -90,10 +90,16 @@ class Cake extends Transparent implements FoodSource{
 	}
 
 	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player and $player->getHealth() < $player->getMaxHealth()){
-			$ev = new EntityEatBlockEvent($player, $this);
+		if($player instanceof Player and $player->getFood() < $player->getMaxFood()){
+			$player->getServer()->getPluginManager()->callEvent($ev = new EntityEatBlockEvent($player, $this));
 
 			if(!$ev->isCancelled()){
+				$player->addFood($ev->getFoodRestore());
+				$player->addSaturation($ev->getSaturationRestore());
+				foreach($ev->getAdditionalEffects() as $effect){
+					$player->addEffect($effect);
+				}
+
 				$this->getLevel()->setBlock($this, $ev->getResidue());
 				return true;
 			}
@@ -113,8 +119,8 @@ class Cake extends Transparent implements FoodSource{
 	public function getResidue(){
 		$clone = clone $this;
 		$clone->meta++;
-		if($clone->meta >= 0x06){
-			$clone = new Air();
+		if($clone->meta > 0x06){
+			$clone = Block::get(Block::AIR);
 		}
 		return $clone;
 	}

@@ -2436,8 +2436,39 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 						$pearl->spawnToAll();
 					}
 				}
+			}elseif($item->getId() === Item::SPLASH_POTION){
+				$nbt = new CompoundTag("", [
+					new ListTag("Pos", [
+						new DoubleTag("", $this->x),
+						new DoubleTag("", $this->y + $this->getEyeHeight()),
+						new DoubleTag("", $this->z)
+					]),
+					new ListTag("Motion", [
+						new DoubleTag("", $aimPos->x),
+						new DoubleTag("", $aimPos->y),
+						new DoubleTag("", $aimPos->z)
+					]),
+					new ListTag("Rotation", [
+						new FloatTag("", $this->yaw),
+						new FloatTag("", $this->pitch)
+					]),
+					new ShortTag("PotionId", $item->getDamage())
+				]);
+				$f = 1.1;
+				$potion = Entity::createEntity("ThrownPotion", $this->getLevel(), $nbt, $this);
+				$potion->setMotion($potion->getMotion()->multiply($f));
+				if($this->isSurvival()){
+					$item->setCount($item->getCount() - 1);
+					$this->inventory->setItemInHand($item->getCount() > 0 ? $item : Item::get(Item::AIR));
+				}
+				$this->server->getPluginManager()->callEvent($ev = new ProjectileLaunchEvent($potion));
+				if($ev->isCancelled()){
+					$potion->kill();
+				}else{
+					$potion->spawnToAll();
+					$this->level->addSound(new LaunchSound($this), $this->getViewers());
+				}
 			}
-
 
 			if($item instanceof Armor){
 				switch($item->getId()){
@@ -3287,6 +3318,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$ev = new PlayerDropItemEvent($this, $item);
 		$this->server->getPluginManager()->callEvent($ev);
 		if($ev->isCancelled()){
+			$this->inventory->addItem($item); //return this item to player's inventory
 			return;
 		}
 
@@ -3858,6 +3890,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 
 		return -1;
+	}
+	
+	/**
+	 * @return Inventory[]
+	 */
+	public function getWindows(){
+		return $this->windowIndex;
 	}
 
 	/**

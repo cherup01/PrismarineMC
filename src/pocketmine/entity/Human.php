@@ -570,7 +570,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		if(!$this->closed){
 			if($this->getFloatingInventory() instanceof FloatingInventory){
  				foreach($this->getFloatingInventory()->getContents() as $craftingItem){
- 					$this->level->dropItem($this, $craftingItem);
+ 					$this->getInventory()->addItem($craftingItem);
+					$this->getFloatingInventory()->removeItem($craftingItem);
  				}
  			}else{
  				$this->server->getLogger()->debug("Attempted to drop a null crafting inventory\n");
