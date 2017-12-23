@@ -35,7 +35,7 @@ class RakLibServer extends \Thread{
 	protected $mainPath;
 
 	/** @var int */
-	protected $serverId;
+	protected $serverId = 0;
 
 	/**
 	 * @param \ThreadedLogger $logger
