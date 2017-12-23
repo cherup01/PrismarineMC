@@ -1,7 +1,7 @@
 Prismarine [![Build Status](https://travis-ci.org/PrismarineMC/Prismarine.svg?branch=master)](https://travis-ci.org/PrismarineMC/Prismarine)
 ===================
 
-__An server software for Minecraft: Bedrock Engine v1.2.7__
+__An server software for Minecraft: Bedrock Engine v1.2.8__
 
 **WARNING! This server software isn't compatible with Minecraft: Java Edition**
 
