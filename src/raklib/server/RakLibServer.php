@@ -34,6 +34,9 @@ class RakLibServer extends \Thread{
 
 	protected $mainPath;
 
+	/** @var int */
+	protected $serverId;
+
 	/**
 	 * @param \ThreadedLogger $logger
 	 * @param \ClassLoader    $loader
@@ -96,6 +99,15 @@ class RakLibServer extends \Thread{
 
 	public function getInterface(){
 		return $this->interface;
+	}
+
+	/**
+	 * Returns RakNet server ID
+	 *
+	 * @return int
+	 */
+	public function getServerId(){
+		return $this->serverId;
 	}
 
 	/**
@@ -232,7 +244,9 @@ class RakLibServer extends \Thread{
 
 
 			$socket = new UDPServerSocket($this->getLogger(), $this->port, $this->interface);
-			new SessionManager($this, $socket);
+			$manager = new SessionManager($this, $socket);
+			$this->serverId = $manager->getID();
+			$manager->run();
 		}catch(\Throwable $e){
 			$this->logger->logException($e);
 		}
