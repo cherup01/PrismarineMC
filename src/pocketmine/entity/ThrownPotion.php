@@ -95,6 +95,10 @@ class ThrownPotion extends Projectile{
 	}
 
 	public function onCollideWithEntity(Entity $entity){
+		if($entity instanceof Player and $entity->isSpectator()){
+			return;
+		}
+		
 		$this->splash();
 	}
 
