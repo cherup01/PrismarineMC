@@ -33,6 +33,7 @@ use pocketmine\level\MovingObjectPosition;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ShortTag;
+use pocketmine\Player;
 
 abstract class Projectile extends Entity{
 
@@ -89,7 +90,11 @@ abstract class Projectile extends Entity{
 		return (int) ceil(sqrt($this->motionX ** 2 + $this->motionY ** 2 + $this->motionZ ** 2) * $this->damage);
 	}
 
-	public function onCollideWithEntity(Entity $entity){
+	public function onCollideWithEntity(Entity $entity){\
+		if($entity instanceof Player and $entity->isSpectator()){
+			return;
+		}
+
 		$this->server->getPluginManager()->callEvent(new ProjectileHitEvent($this));
 
 		$damage = $this->getResultDamage();
