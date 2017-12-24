@@ -138,16 +138,27 @@ class SimpleInventoryTransaction implements InventoryTransaction{
 		return $this->matchItems($needItems, $haveItems) and count($this->actions) > 0 and count($haveItems) === 0 and count($needItems) === 0;
 	}
 
+	protected function sendInventories() : void{
+		foreach($this->inventories as $inventory){
+			$inventory->sendContents($this->source);
+			if($inventory instanceof PlayerInventory){
+				$inventory->sendArmorContents($this->source);
+			}
+		}
+	}
+
 	/**
 	 * @return bool
 	 */
 	public function execute() : bool{
 		if($this->hasExecuted() or !$this->canExecute()){
+			$this->sendInventories();
 			return false;
 		}
 
 		Server::getInstance()->getPluginManager()->callEvent($ev = new InventoryTransactionEvent($this));
 		if($ev->isCancelled()){
+			$this->sendInventories();
 			return false;
 		}
 
