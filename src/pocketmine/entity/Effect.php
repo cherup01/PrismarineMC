@@ -316,6 +316,7 @@ class Effect{
 				return true;
 			case Effect::INSTANT_DAMAGE:
 			case Effect::INSTANT_HEALTH:
+			case Effect::SATURATION:
 				//If forced to last longer than 1 tick, these apply every tick.
 				return true;
 		}
@@ -367,6 +368,12 @@ class Effect{
 				if(!($entity instanceof Player and $entity->isCreative())){
 					$amount = 2 * (2 ** ($this->getEffectLevel() % 32));
 					$entity->attack($amount, new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, $amount));
+				}
+				break;
+			case Effect::SATURATION:
+				if($entity instanceof Human){
+					$entity->addFood($this->getEffectLevel());
+					$entity->addSaturation($this->getEffectLevel() * 2);
 				}
 				break;
 		}
