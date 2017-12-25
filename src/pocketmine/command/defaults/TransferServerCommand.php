@@ -49,16 +49,16 @@ class TransferServerCommand extends VanillaCommand{
 			return false;
 		}
 
-		if(!(($player = $sender->getServer()->getPlayerExact($args[2])) instanceof Player)){
-			$sender->sendMessage("Invalid player name given.");
+		if(!($sender instanceof Player)){
+			if(!(($player = $sender->getServer()->getPlayerExact($args[2])) instanceof Player)){
+				$sender->sendMessage("Invalid player name given.");
 
-			return false;
-		}
-
-		if(!($sender instanceof Player))
+				return false;
+			}
 			$player->transfer($args[0], (int) ($args[1] ?? 19132));
-		else
+		}else{
 			$sender->transfer($args[0], (int) ($args[1] ?? 19132));
+		}
 
 		return true;
 	}
