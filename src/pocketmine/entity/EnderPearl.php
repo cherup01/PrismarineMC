@@ -83,6 +83,14 @@ class EnderPearl extends Projectile{
 
 		return $hasUpdate;
 	}
+	
+	public function onCollideWithEntity(Entity $entity){
+		if($entity instanceof Player and $entity->isSpectator()){
+			return;
+		}
+		
+		$this->isCollided = true;
+	}
 
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
