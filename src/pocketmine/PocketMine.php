@@ -79,7 +79,7 @@ namespace pocketmine {
 	use raklib\RakLib;
 
 	const NAME = "Prismarine";
-	const VERSION = "1.2.7";
+	const VERSION = "1.2.8";
 	const API_VERSION = "3.0.0";
 	const CODENAME = "Cake";
 
