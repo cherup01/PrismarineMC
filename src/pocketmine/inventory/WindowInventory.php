@@ -97,6 +97,5 @@ class WindowInventory extends CustomInventory{
         $pk->blockData = $who->getLevel()->getBlockDataAt($holder->x, $holder->y, $holder->z);
         $pk->flags = UpdateBlockPacket::FLAG_ALL;
         $who->dataPacket($pk);
-        parent::onClose($who);
     }
 }
