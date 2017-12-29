@@ -546,14 +546,6 @@ abstract class Entity extends Location implements Metadatable{
 		$this->setGenericFlag(self::DATA_FLAG_SNEAKING, $value);
 	}
 
-	public function isGliding() : bool{
-		return $this->getGenericFlag(self::DATA_FLAG_GLIDING);
-	}
-
-	public function setGliding(bool $value = true){
-		$this->setGenericFlag(self::DATA_FLAG_GLIDING, $value);
-	}
-
 	public function isSprinting() : bool{
 		return $this->getGenericFlag(self::DATA_FLAG_SPRINTING);
 	}
@@ -1545,7 +1537,9 @@ abstract class Entity extends Location implements Metadatable{
 	public function isInsideOfSolid() : bool{
 		$block = $this->level->getBlock($this->temporalVector->setComponents(Math::floorFloat($this->x), Math::floorFloat($y = ($this->y + $this->getEyeHeight())), Math::floorFloat($this->z)));
 
-		return $block->isSolid() and !$block->isTransparent() and $block->collidesWithBB($this->getBoundingBox());
+		$bb = $block->getBoundingBox();
+
+		return $bb !== null and $block->isSolid() and !$block->isTransparent() and $bb->intersectsWith($this->getBoundingBox());
 	}
 
 	public function fastMove(float $dx, float $dy, float $dz) : bool{

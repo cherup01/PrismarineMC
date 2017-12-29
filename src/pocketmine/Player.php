@@ -69,7 +69,6 @@ use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\player\PlayerToggleFlightEvent;
-use pocketmine\event\player\PlayerToggleGlideEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\event\player\PlayerToggleSprintEvent;
 use pocketmine\event\player\PlayerTransferEvent;
@@ -1714,10 +1713,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$this->timings->startTiming();
 
 		if($this->spawned){
-			if($this->isGliding()){
-				$this->resetFallDistance();
-			}
-
 			$this->processMovement($tickDiff);
 			$this->entityBaseTick($tickDiff);
 
@@ -2515,7 +2510,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 								case Item::IRON_CHESTPLATE:
 								case Item::DIAMOND_CHESTPLATE:
 								case Item::GOLDEN_CHESTPLATE:
-								case Item::ELYTRA:
 									$this->inventory->setChestplate($item);
 									break;
 								case Item::LEATHER_LEGGINGS:
@@ -2958,27 +2952,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 				}
 				return true;
 			case PlayerActionPacket::ACTION_START_GLIDE:
-				if($this->inventory->getChestplate()->getId() !== Item::ELYTRA){
-					$this->server->getLogger()->debug("Client ".$this->username." tried to start glide without elytra");
-					return false;
-				}
-				$ev = new PlayerToggleGlideEvent($this, true);
-				$this->server->getPluginManager()->callEvent($ev);
-				if($ev->isCancelled()){
-					$this->sendData($this);
-				}else{
-					$this->setGliding(true);
-				}
-				return true;
 			case PlayerActionPacket::ACTION_STOP_GLIDE:
-				$ev = new PlayerToggleGlideEvent($this, false);
-				$this->server->getPluginManager()->callEvent($ev);
-				if($ev->isCancelled()){
-					$this->sendData($this);
-				}else{
-					$this->setGliding(false);
-				}
-				return true;
+				break; //TODO
 			case PlayerActionPacket::ACTION_CONTINUE_BREAK:
 				$block = $this->level->getBlock($pos);
 				$this->level->broadcastLevelEvent($pos, LevelEventPacket::EVENT_PARTICLE_PUNCH_BLOCK, $block->getId() | ($block->getDamage() << 8) | ($packet->face << 16));

@@ -1192,9 +1192,7 @@ class Level implements ChunkManager, Metadatable{
 				for($y = $minY; $y <= $maxY; ++$y){
 					$block = $this->getBlock($this->temporalVector->setComponents($x, $y, $z));
 					if(!$block->canPassThrough() and $block->collidesWithBB($bb)){
-						foreach($block->getCollisionBoxes() as $blockBB){
-							$collides[] = $blockBB;
-						}
+						$collides[] = $block->getBoundingBox();
 					}
 				}
 			}
@@ -1791,25 +1789,30 @@ class Level implements ChunkManager, Metadatable{
 
 		$hand->position($block);
 
-		if($hand->isSolid()){
-			foreach($hand->getCollisionBoxes() as $collisionBox){
-				$entities = $this->getCollidingEntities($collisionBox);
-				foreach($entities as $e){
-					if($e instanceof Arrow or $e instanceof DroppedItem or ($e instanceof Player and $e->isSpectator())){
-						continue;
-					}
-					return false; //Entity in block
+		if($hand->isSolid() === true and $hand->getBoundingBox() !== null){
+			$entities = $this->getCollidingEntities($hand->getBoundingBox());
+			$realCount = 0;
+			foreach($entities as $e){
+				if($e instanceof Arrow or $e instanceof DroppedItem or ($e instanceof Player and $e->isSpectator())){
+					continue;
 				}
-				if($player !== null){
-					if(($diff = $player->getNextPosition()->subtract($player->getPosition())) and $diff->lengthSquared() > 0.00001){
-						$bb = $player->getBoundingBox()->getOffsetBoundingBox($diff->x, $diff->y, $diff->z);
-						if($collisionBox->intersectsWith($bb)){
-							return false; //Inside player BB
-						}
- 					}
-  				}
-  			}
-  		}
+				++$realCount;
+			}
+
+			if($player !== null){
+				if(($diff = $player->getNextPosition()->subtract($player->getPosition())) and $diff->lengthSquared() > 0.00001){
+					$bb = $player->getBoundingBox()->getOffsetBoundingBox($diff->x, $diff->y, $diff->z);
+					if($hand->getBoundingBox()->intersectsWith($bb)){
+						++$realCount;
+					}
+				}
+			}
+
+			if($realCount > 0){
+				return false; //Entity in block
+			}
+		}
+
 
 		if($player !== null){
 			$ev = new BlockPlaceEvent($player, $hand, $block, $target, $item);

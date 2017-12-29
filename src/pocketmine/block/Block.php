@@ -67,9 +67,6 @@ class Block extends Position implements BlockIds, Metadatable{
 	/** @var AxisAlignedBB */
 	public $boundingBox = null;
 
-	/** @var AxisAlignedBB[]|null */
-	protected $collisionBoxes = null;
-
 	/**
 	 * @param int    $id     The block type's ID, 0-255
 	 * @param int    $meta   Meta value of the block type
@@ -441,45 +438,17 @@ class Block extends Position implements BlockIds, Metadatable{
 	 *
 	 * @return bool
 	 */
- 	public function collidesWithBB(AxisAlignedBB $bb) : bool{
-		$bbs = $this->getCollisionBoxes();
+	public function collidesWithBB(AxisAlignedBB $bb) : bool{
+		$bb2 = $this->getBoundingBox();
 
-		foreach($bbs as $bb2){
-			if($bb->intersectsWith($bb2)){
-				return true;
-			}
-		}
-
-		return false;
-  	}
+		return $bb2 !== null and $bb->intersectsWith($bb2);
+	}
 
 	/**
 	 * @param Entity $entity
 	 */
 	public function onEntityCollide(Entity $entity){
 
-	}
-
-	/**
-	 * @return AxisAlignedBB[]
-	 */
-	public function getCollisionBoxes() : array{
-		if($this->collisionBoxes === null){
-			$this->collisionBoxes = $this->recalculateCollisionBoxes();
-		}
-
-		return $this->collisionBoxes;
-	}
-
-	/**
-	 * @return AxisAlignedBB[]
-	 */
-	protected function recalculateCollisionBoxes() : array{
-		if($bb = $this->recalculateBoundingBox()){
-			return [$bb];
-		}
-
-		return [];
 	}
 
 	/**
@@ -516,36 +485,85 @@ class Block extends Position implements BlockIds, Metadatable{
 	 * @return MovingObjectPosition|null
 	 */
 	public function calculateIntercept(Vector3 $pos1, Vector3 $pos2){
-		$bbs = $this->getCollisionBoxes();
-		if(empty($bbs)){
+		$bb = $this->getBoundingBox();
+		if($bb === null){
 			return null;
 		}
 
-		/** @var MovingObjectPosition|null $currentHit */
-		$currentHit = null;
-		/** @var int|float $currentDistance */
-		$currentDistance = PHP_INT_MAX;
+		$v1 = $pos1->getIntermediateWithXValue($pos2, $bb->minX);
+		$v2 = $pos1->getIntermediateWithXValue($pos2, $bb->maxX);
+		$v3 = $pos1->getIntermediateWithYValue($pos2, $bb->minY);
+		$v4 = $pos1->getIntermediateWithYValue($pos2, $bb->maxY);
+		$v5 = $pos1->getIntermediateWithZValue($pos2, $bb->minZ);
+		$v6 = $pos1->getIntermediateWithZValue($pos2, $bb->maxZ);
 
-		foreach($bbs as $bb){
-			$nextHit = $bb->calculateIntercept($pos1, $pos2);
-			if($nextHit === null){
-				continue;
-			}
-
-			$nextDistance = $nextHit->hitVector->distanceSquared($pos1);
-			if($nextDistance < $currentDistance){
-				$currentHit = $nextHit;
-				$currentDistance = $nextDistance;
-			}
+		if($v1 !== null and !$bb->isVectorInYZ($v1)){
+			$v1 = null;
 		}
 
-		if($currentHit !== null){
-			$currentHit->blockX = $this->x;
-			$currentHit->blockY = $this->y;
-			$currentHit->blockZ = $this->z;
- 		}
+		if($v2 !== null and !$bb->isVectorInYZ($v2)){
+			$v2 = null;
+		}
 
-		return $currentHit;
+		if($v3 !== null and !$bb->isVectorInXZ($v3)){
+			$v3 = null;
+		}
+
+		if($v4 !== null and !$bb->isVectorInXZ($v4)){
+			$v4 = null;
+		}
+
+		if($v5 !== null and !$bb->isVectorInXY($v5)){
+			$v5 = null;
+		}
+
+		if($v6 !== null and !$bb->isVectorInXY($v6)){
+			$v6 = null;
+		}
+
+		$vector = $v1;
+
+		if($v2 !== null and ($vector === null or $pos1->distanceSquared($v2) < $pos1->distanceSquared($vector))){
+			$vector = $v2;
+		}
+
+		if($v3 !== null and ($vector === null or $pos1->distanceSquared($v3) < $pos1->distanceSquared($vector))){
+			$vector = $v3;
+		}
+
+		if($v4 !== null and ($vector === null or $pos1->distanceSquared($v4) < $pos1->distanceSquared($vector))){
+			$vector = $v4;
+		}
+
+		if($v5 !== null and ($vector === null or $pos1->distanceSquared($v5) < $pos1->distanceSquared($vector))){
+			$vector = $v5;
+		}
+
+		if($v6 !== null and ($vector === null or $pos1->distanceSquared($v6) < $pos1->distanceSquared($vector))){
+			$vector = $v6;
+		}
+
+		if($vector === null){
+			return null;
+		}
+
+		$f = -1;
+
+		if($vector === $v1){
+			$f = 4;
+		}elseif($vector === $v2){
+			$f = 5;
+		}elseif($vector === $v3){
+			$f = 0;
+		}elseif($vector === $v4){
+			$f = 1;
+		}elseif($vector === $v5){
+			$f = 2;
+		}elseif($vector === $v6){
+			$f = 3;
+		}
+
+		return MovingObjectPosition::fromBlock($this->x, $this->y, $this->z, $f, $vector->add($this->x, $this->y, $this->z));
 	}
 
 	public function setMetadata(string $metadataKey, MetadataValue $newMetadataValue){
