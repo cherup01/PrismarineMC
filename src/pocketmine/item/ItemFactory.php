@@ -189,6 +189,8 @@ class ItemFactory{
 
 			self::registerItem(new SplashPotion());
 
+			self::registerItem(new Elytra());
+
 			self::registerItem(new GoldenAppleEnchanted());
 		}
 

@@ -70,6 +70,10 @@ class Air extends Transparent{
 		return null;
 	}
 
+	public function getCollisionBoxes() : array{
+		return [];
+	}
+
 	public function getHardness() : float{
 		return -1;
 	}
