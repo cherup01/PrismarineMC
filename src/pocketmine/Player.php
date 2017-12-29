@@ -1708,7 +1708,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 	}
 
-	public function canInteract(Vector3 $pos, $maxDistance, $maxDiff = 0.5){
+	public function canInteract(Vector3 $pos, $maxDistance){
 		$eyePos = $this->getPosition()->add(0, $this->getEyeHeight(), 0);
 		if($eyePos->distanceSquared($pos) > $maxDistance ** 2){
 			return false;
@@ -1717,7 +1717,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$dV = $this->getDirectionPlane();
 		$dot = $dV->dot(new Vector2($eyePos->x, $eyePos->z));
 		$dot1 = $dV->dot(new Vector2($pos->x, $pos->z));
-		return ($dot1 - $dot) >= -$maxDiff;
+		return ($dot1 - $dot) >= -0.8;
 	}
 
 
