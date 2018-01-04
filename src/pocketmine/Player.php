@@ -2830,14 +2830,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		}
 
 		/**
-		 * Drop anything still left in the crafting inventory
+		 * Return anything still left in the crafting inventory
 		 * This will usually never be needed since Windows 10 clients will send DropItemPackets
 		 * which will cause this to happen anyway, but this is here for when transactions
 		 * fail and items end up stuck in the crafting inventory.
 		 */
-		/*foreach($this->getFloatingInventory()->getContents() as $item){
-			$this->getTransactionQueue()->addTransaction(new DropItemTransaction($item));
-		}*/
+		$this->inventory->addItem(...$this->getFloatingInventory()->getContents());
+		$this->getFloatingInventory()->clearAll();
 
 		return true;
 	}
