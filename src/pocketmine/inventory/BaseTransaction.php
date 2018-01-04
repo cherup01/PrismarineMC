@@ -204,7 +204,10 @@ class BaseTransaction implements Transaction{
 				/* All checks passed, make changes to floating inventory
 				 * This will not be reached unless all requirements are met */
 				if($change["out"] instanceof Item){
-					$source->getFloatingInventory()->addItem($change["out"]);
+					if($inFloating)
+						$source->getFloatingInventory()->addItem($change["out"]);
+					else
+						$source->getInventory()->addItem($change["out"]);
 				}
 				if($change["in"] instanceof Item){
 					if($inFloating)
