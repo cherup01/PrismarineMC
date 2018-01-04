@@ -182,6 +182,8 @@ class BaseTransaction implements Transaction{
 				if($change === null){ //No changes to make, ignore this transaction
 					return true;
 				}
+				
+				$inFloating = false;
 
 				/* Verify that we have the required items */
 				if($change["out"] instanceof Item){
@@ -190,7 +192,11 @@ class BaseTransaction implements Transaction{
 					}
 				}
 				if($change["in"] instanceof Item){
-					if(!$source->getFloatingInventory()->contains($change["in"])){
+					if($source->getFloatingInventory()->contains($change["in"])){
+						$inFloating = true;
+					}elseif($source->getInventory()->contains($change["in"])){
+						$inFloating = false;
+					}else{
 						return false;
 					}
 				}
@@ -201,7 +207,10 @@ class BaseTransaction implements Transaction{
 					$source->getFloatingInventory()->addItem($change["out"]);
 				}
 				if($change["in"] instanceof Item){
-					$source->getFloatingInventory()->removeItem($change["in"]);
+					if($inFloating)
+						$source->getFloatingInventory()->removeItem($change["in"]);
+					else
+						$source->getInventory()->removeItem($change["in"]);
 				}
 			}
 			$this->getInventory()->setItem($this->getSlot(), $this->getTargetItem(), false);
