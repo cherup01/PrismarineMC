@@ -1420,9 +1420,15 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			if($entity instanceof Arrow and $entity->hadCollision){
 				$item = Item::get(Item::ARROW, 0, 1);
 
-				if($this->isSurvival() and !$this->inventory->canAddItem($item)){
- 					continue;
- 				}
+				$add = false;
+				if(!$this->server->allowInventoryCheats and !$this->isCreative()){
+					if(!$this->getFloatingInventory()->canAddItem($item) or !$this->inventory->canAddItem($item)){
+						//The item is added to the floating inventory to allow client to handle the pickup
+						//We have to also check if it can be added to the real inventory before sending packets.
+						continue;
+					}
+					$add = true;
+				}
 
 				$this->server->getPluginManager()->callEvent($ev = new InventoryPickupArrowEvent($this->inventory, $entity));
 				if($entity->getBow()->hasEnchantment(Enchantment::INFINITY))
@@ -1436,7 +1442,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 				$pk->target = $entity->getId();
 				$this->server->broadcastPacket($entity->getViewers(), $pk);
 
-				$this->inventory->addItem(clone $item);
+				if($add){
+					$this->getFloatingInventory()->addItem(clone $item);
+				}
 				$entity->kill();
 			}elseif($entity instanceof DroppedItem){
 				if($entity->getPickupDelay() <= 0){
@@ -1444,9 +1452,12 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 					if($item instanceof Item){
 
-						if($this->isSurvival() and !$this->inventory->canAddItem($item)){
- 							continue;
- 						}
+						if(!$this->server->allowInventoryCheats and !$this->isCreative()){
+							if(!$this->getFloatingInventory()->canAddItem($item) or !$this->inventory->canAddItem($item)){
+								continue;
+							}
+							$add = true;
+						}
 
 						$this->server->getPluginManager()->callEvent($ev = new InventoryPickupItemEvent($this->inventory, $entity));
 						if($ev->isCancelled()){
@@ -1458,7 +1469,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 						$pk->target = $entity->getId();
 						$this->server->broadcastPacket($entity->getViewers(), $pk);
 
-						$this->inventory->addItem(clone $item);
+						if($add){
+							$this->getFloatingInventory()->addItem(clone $item);
+						}
 
 						$entity->kill();
 					}
@@ -2157,7 +2170,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			return true;
 		}
 
-		$this->inventory->equipItem($packet->hotbarSlot, $packet->inventorySlot);
+		/**
+		 * Handle hotbar slot remapping
+		 * This is the only time and place when hotbar mapping should ever be changed.
+		 * Changing hotbar slot mapping at will has been deprecated because it causes far too many
+		 * issues with Windows 10 Edition Beta.
+		 */
+		$this->inventory->setHeldItemIndex($packet->hotbarSlot, false, $packet->inventorySlot);
 
 		$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_ACTION, false);
 
@@ -3342,7 +3361,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$ev = new PlayerDropItemEvent($this, $item);
 		$this->server->getPluginManager()->callEvent($ev);
 		if($ev->isCancelled()){
-			$this->inventory->addItem($item); //return this item to player's inventory
+			$this->getFloatingInventory()->removeItem($item);
+			$this->getInventory()->addItem($item);
 			return;
 		}
 

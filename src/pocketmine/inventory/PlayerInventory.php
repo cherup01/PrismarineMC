@@ -47,6 +47,7 @@ class PlayerInventory extends BaseInventory{
 	public function __construct(Human $player, $contents = null){
 		$this->resetHotbar(false);
 		parent::__construct($player, InventoryType::get(InventoryType::PLAYER));
+
 		if($contents !== null){
 			if($contents instanceof ListTag){ //Saved data to be loaded into the inventory
 				foreach($contents as $item){
@@ -202,13 +203,11 @@ class PlayerInventory extends BaseInventory{
 			if($slotMapping !== null){
 				/* Handle a hotbar slot mapping change. This allows PE to select different inventory slots.
 				 * This is the only time slot mapping should ever be changed. */
-
 				if($slotMapping < 0 or $slotMapping >= $this->getSize()){
 					//Mapping was not in range of the inventory, set it to -1
 					//This happens if the client selected a blank slot (sends 255)
 					$slotMapping = -1;
 				}
-
 				$item = $this->getItem($slotMapping);
 				if($this->getHolder() instanceof Player){
 					Server::getInstance()->getPluginManager()->callEvent($ev = new PlayerItemHeldEvent($this->getHolder(), $item, $slotMapping, $hotbarSlotIndex));
@@ -224,15 +223,14 @@ class PlayerInventory extends BaseInventory{
 					 * This will already have been done on the client-side so no changes need to be sent. */
 					$this->hotbar[$key] = $this->hotbar[$this->itemInHandIndex];
 				}
-
 				$this->hotbar[$this->itemInHandIndex] = $slotMapping;
 			}
 			$this->sendHeldItem($this->getHolder()->getViewers());
 			if($sendToHolder){
 				$this->sendHeldItem($this->getHolder());
- 			}
- 		}
- 	}
+			}
+		}
+	}
 
 	/**
 	 * Returns the currently-held item.
@@ -305,6 +303,11 @@ class PlayerInventory extends BaseInventory{
 		}
 	}
 
+	/**
+	 * @param int  $index
+	 * @param Item $before
+	 * @param bool $send
+	 */
 	public function onSlotChange($index, $before, $send){
 		if($send){
 			$holder = $this->getHolder();
@@ -319,10 +322,10 @@ class PlayerInventory extends BaseInventory{
 				$this->sendHeldItem($this->getHolder());
 			}
 		}elseif($index >= $this->getSize()){ //Armour equipment
- 			$this->sendArmorSlot($index, $this->getViewers());
- 			$this->sendArmorSlot($index, $this->getHolder()->getViewers());
- 		}
- 	}
+			$this->sendArmorSlot($index, $this->getViewers());
+			$this->sendArmorSlot($index, $this->getHolder()->getViewers());
+		}
+	}
 
 	/**
 	 * Returns the number of slots in the hotbar.
@@ -460,7 +463,8 @@ class PlayerInventory extends BaseInventory{
 		for($index = 0; $index < $limit; ++$index){
 			$this->clear($index, $send);
 		}
-		$this->hotbar = range(0, $this->getHotbarSize() - 1, 1);
+		$this->resetHotbar(false);
+		$this->sendContents($this->getViewers());
 	}
 
 	/**

@@ -129,11 +129,11 @@ class BaseTransaction implements Transaction{
 	public function getChange(){
 		$sourceItem = $this->getInventory()->getItem($this->slot);
 
-		if($sourceItem->deepEquals($this->targetItem, true, true, true)){
+		if($sourceItem->equals($this->targetItem, true, true, true)){
 			//This should never happen, somehow a change happened where nothing changed
 			return null;
 
-		}elseif($sourceItem->deepEquals($this->targetItem)){ //Same item, change of count
+		}elseif($sourceItem->equals($this->targetItem)){ //Same item, change of count
 			$item = clone $sourceItem;
 			$countDiff = $this->targetItem->getCount() - $sourceItem->getCount();
 			$item->setCount(abs($countDiff));
@@ -169,22 +169,18 @@ class BaseTransaction implements Transaction{
 
 	/**
 	 * @param Player $source
+	 *
 	 * @return bool
 	 *
 	 * Handles transaction execution. Returns whether transaction was successful or not.
 	 */
-
-	public function execute(Player $source): bool{
+	public function execute(Player $source) : bool{
 		if($this->getInventory()->processSlotChange($this)){ //This means that the transaction should be handled the normal way
 			if(!$source->getServer()->allowInventoryCheats and !$source->isCreative()){
 				$change = $this->getChange();
-
 				if($change === null){ //No changes to make, ignore this transaction
 					return true;
 				}
-				
-				$inFloating = false;
-
 				/* Verify that we have the required items */
 				if($change["out"] instanceof Item){
 					if(!$this->getInventory()->slotContains($this->getSlot(), $change["out"])){
@@ -192,30 +188,21 @@ class BaseTransaction implements Transaction{
 					}
 				}
 				if($change["in"] instanceof Item){
-					if($source->getFloatingInventory()->contains($change["in"])){
-						$inFloating = true;
-					}elseif($source->getInventory()->contains($change["in"])){
-						$inFloating = false;
-					}else{
+					if(!$source->getFloatingInventory()->contains($change["in"])){
 						return false;
 					}
 				}
-
 				/* All checks passed, make changes to floating inventory
 				 * This will not be reached unless all requirements are met */
 				if($change["out"] instanceof Item){
 					$source->getFloatingInventory()->addItem($change["out"]);
 				}
 				if($change["in"] instanceof Item){
-					if($inFloating)
-						$source->getFloatingInventory()->removeItem($change["in"]);
-					else
-						$source->getInventory()->removeItem($change["in"]);
+					$source->getFloatingInventory()->removeItem($change["in"]);
 				}
 			}
 			$this->getInventory()->setItem($this->getSlot(), $this->getTargetItem(), false);
 		}
-		
 		return true;
 	}
 
