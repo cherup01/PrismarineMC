@@ -52,11 +52,11 @@ class Arrow extends Projectile{
 		$this->bow = $bow;
 	}
 
-	public function getBow() : Bow {
+	public function getBow() : ?Bow{
 		return $this->bow;
 	}
 
-	public function setBow(Bow $bow){
+	public function setBow(?Bow $bow){
 		$this->bow = $bow;
 	}
 
