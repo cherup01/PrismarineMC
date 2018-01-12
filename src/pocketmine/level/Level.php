@@ -117,6 +117,8 @@ class Level implements ChunkManager, Metadatable{
 	private static $chunkLoaderCounter = 1;
 	public static $COMPRESSION_LEVEL = 8;
 
+	const PACKETS_THRESHOLD = 64;
+
 	const Y_MASK = 0xFF;
 	const Y_MAX = 0x100; //256
 
@@ -778,11 +780,20 @@ class Level implements ChunkManager, Metadatable{
 			Level::getXZ($index, $chunkX, $chunkZ);
 			$chunkPlayers = $this->getChunkPlayers($chunkX, $chunkZ);
 			if(count($chunkPlayers) > 0){
-				$this->server->batchPackets($chunkPlayers, $entries, false, false);
+				$toSend = [];
+				foreach($entries as $key => $entry){
+					$toSend[] = $entry;
+					unset($this->chunkPackets[$index][$key]);
+					if(count($toSend) >= self::PACKETS_THRESHOLD){
+						break;
+					}
+				}
+				$this->server->batchPackets($chunkPlayers, $toSend, false, false);
+			}
+			if(!empty($this->chunkPackets[$index])){
+				unset($this->chunkPackets[$index]);
 			}
 		}
-
-		$this->chunkPackets = [];
 
 		$this->timings->doTick->stopTiming();
 	}
