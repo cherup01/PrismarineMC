@@ -354,7 +354,7 @@ abstract class Living extends Entity implements Damageable{
 				if($source->getCause() === EntityDamageEvent::CAUSE_ENTITY_ATTACK and !$damager->isFlying() and $damager->fallDistance > 0 and !$damager->isSprinting() and !$damager->hasEffect(Effect::BLINDNESS) and !$damager->isInsideOfWater()){
 					//Critical hit
 					for($i = 0; $i < 15; $i++){
-						$this->level->addParticle(new CriticalParticle(new Vector3($this->x + mt_rand(-10, 10) / 10, $this->y + mt_rand(0, 20) / 10, $this->z + mt_rand(-5, 5) / 10)));
+						$this->level->addParticle(new CriticalParticle(new Vector3($this->x + mt_rand(-5, 5) / 10, $this->y + mt_rand(0, 20) / 10, $this->z + mt_rand(-5, 5) / 10)));
 					}
 					$source->setDamage($source->getDamage() / 2, EntityDamageEvent::MODIFIER_CRITICAL);
 				}
