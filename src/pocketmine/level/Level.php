@@ -790,7 +790,7 @@ class Level implements ChunkManager, Metadatable{
 				}
 				$this->server->batchPackets($chunkPlayers, $toSend, false, false);
 			}
-			if(!empty($this->chunkPackets[$index])){
+			if(empty($this->chunkPackets[$index])){
 				unset($this->chunkPackets[$index]);
 			}
 		}
