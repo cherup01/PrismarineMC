@@ -88,6 +88,10 @@ class CommandBlockUpdatePacket extends DataPacket{
 		$this->putBool($this->shouldTrackOutput);
 	}
 
+	public function mustBeDecoded() : bool{
+		return false;
+	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleCommandBlockUpdate($this);
 	}

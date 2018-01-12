@@ -45,6 +45,10 @@ class SpawnExperienceOrbPacket extends DataPacket{
 		$this->putVector3f($this->x, $this->y, $this->z);
 		$this->putVarInt($this->amount);
 	}
+	
+	public function mustBeDecoded() : bool{
+		return false;
+	}
 
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleSpawnExperienceOrb($this);

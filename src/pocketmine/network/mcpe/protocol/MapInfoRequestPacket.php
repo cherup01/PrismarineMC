@@ -42,6 +42,10 @@ class MapInfoRequestPacket extends DataPacket{
 		$this->putEntityUniqueId($this->mapId);
 	}
 
+	public function mustBeDecoded() : bool{
+		return false;
+	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleMapInfoRequest($this);
 	}

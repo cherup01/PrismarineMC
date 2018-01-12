@@ -48,6 +48,10 @@ class ShowCreditsPacket extends DataPacket{
 		$this->putVarInt($this->status);
 	}
 
+	public function mustBeDecoded() : bool{
+		return false;
+	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleShowCredits($this);
 	}

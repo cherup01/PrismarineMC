@@ -124,6 +124,10 @@ class BossEventPacket extends DataPacket{
 		}
 	}
 
+	public function mustBeDecoded() : bool{
+		return false;
+	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleBossEvent($this);
 	}

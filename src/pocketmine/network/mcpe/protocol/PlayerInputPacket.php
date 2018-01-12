@@ -50,6 +50,10 @@ class PlayerInputPacket extends DataPacket{
 		$this->putBool($this->unknownBool2);
 	}
 
+	public function mustBeDecoded() : bool{
+		return false;
+	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handlePlayerInput($this);
 	}

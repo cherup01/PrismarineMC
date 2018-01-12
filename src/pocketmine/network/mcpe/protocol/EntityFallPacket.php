@@ -47,6 +47,10 @@ class EntityFallPacket extends DataPacket{
 		$this->putBool($this->bool1);
 	}
 
+	public function mustBeDecoded() : bool{
+		return false;
+	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleEntityFall($this);
 	}

@@ -55,6 +55,10 @@ abstract class DataPacket extends BinaryStream{
 		return false;
 	}
 
+	public function mustBeDecoded() : bool{
+		return true;
+	}
+
 	public function decode(){
 		$this->offset = 1;
 		$this->decodePayload();
