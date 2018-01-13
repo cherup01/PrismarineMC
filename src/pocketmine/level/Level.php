@@ -117,7 +117,7 @@ class Level implements ChunkManager, Metadatable{
 	private static $chunkLoaderCounter = 1;
 	public static $COMPRESSION_LEVEL = 8;
 
-	const PACKETS_THRESHOLD = 64;
+	const PACKETS_THRESHOLD = 32;
 
 	const Y_MASK = 0xFF;
 	const Y_MAX = 0x100; //256
