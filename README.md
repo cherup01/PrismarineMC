@@ -1,7 +1,7 @@
 Prismarine [![Build Status](https://travis-ci.org/PrismarineMC/Prismarine.svg?branch=mcpe1.1)](https://travis-ci.org/PrismarineMC/Prismarine)
 ===================
 
-__An server software for Minecraft: Pocket Edition & Windows 10 Edition__
+__An server software for Minecraft: Pocket Edition & Windows 10 Edition v1.1.x__
 
 
 Introduction
@@ -10,8 +10,8 @@ Prismarine is a server software based on **[PocketMine-MP](https://github.com/pm
 Some of the extended functionality that Prismarine offers:
 
 * Optional Xbox Live authentication
-* Support for Windows 10 Edition
-* Working enchantments - W.I.P - 8/26 of enchantments working
+* Classic Inventory support
+* Enchantments are working - W.I.P - 8/26 of enchantments working
 * Critical hits
 
 However, Prismarine still has a long way to go. We welcome contributions.
@@ -19,9 +19,9 @@ However, Prismarine still has a long way to go. We welcome contributions.
 
 Can I test this before I download it?
 -------------
-Yes, you can. Server below is made by main developer of Prismarine and it's 100% based on Prismarine.<br>
+Yes, you can. Server below is made by main developer of Prismarine and it's 79% based on Prismarine.<br>
 
-IP: **elysium.fun**
+IP: **play.greenwix.fun**
 Port: **19132**
 
 Help & Support
