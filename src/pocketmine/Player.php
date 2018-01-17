@@ -2608,8 +2608,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 						$diff = ($this->server->getTick() - $this->startAction);
 						$p = $diff / 20;
-						$f = min((($p ** 2) + $p * 2) / 3, 1) * 2;
-						$ev = new EntityShootBowEvent($this, $bow, Entity::createEntity("Arrow", $this->getLevel(), $nbt, $this, $f == 2), $f);
+						$f = min((($p ** 2) + $p * 2) / 3, 1) * 3;
+						$ev = new EntityShootBowEvent($this, $bow, Entity::createEntity("Arrow", $this->getLevel(), $nbt, $this, $f == 3), $f);
 
 						if($f < 0.1 or $diff < 5){
 							$ev->setCancelled();
