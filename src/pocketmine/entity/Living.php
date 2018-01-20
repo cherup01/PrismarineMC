@@ -383,7 +383,7 @@ abstract class Living extends Entity implements Damageable{
 		$this->attackTime = 10; //0.5 seconds cooldown
 	}
 
-	public function knockBack(Entity $attacker, $damage, $x, $z, $base = 0.4){
+	public function knockBack(Entity $attacker, $damage, $x, $z, $base = 0.4, $baseY = 0.4){
 		$f = sqrt($x * $x + $z * $z);
 		if($f <= 0){
 			return;
@@ -397,11 +397,11 @@ abstract class Living extends Entity implements Damageable{
 		$motion->y /= 2;
 		$motion->z /= 2;
 		$motion->x += $x * $f * $base;
-		$motion->y += $base;
+		$motion->y += $baseY;
 		$motion->z += $z * $f * $base;
 
-		if($motion->y > $base){
-			$motion->y = $base;
+		if($motion->y > $baseY){
+			$motion->y = $baseY;
 		}
 
 		$this->setMotion($motion);
